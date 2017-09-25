@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort, g
+from flask import Flask, jsonify, request, abort, g, render_template
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -39,7 +39,6 @@ def get_auth_token():
     return jsonify({'token': token.decode('ascii')})
 
 
-
 @app.route('/users', methods=['POST'])
 def new_user():
     username = request.json.get('username')
@@ -75,6 +74,10 @@ def get_user(id):
 def get_resource():
     return jsonify({'data': 'Hello, %s!' % g.user.username})
 
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
 
 # @app.route('/products', methods=['GET', 'POST'])
 # @auth.login_required
