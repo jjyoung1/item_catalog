@@ -60,6 +60,6 @@ class Product(Base):
         }
 
 
-engine = create_engine('sqlite:///regalTree.db')
+engine = create_engine('sqlite:///item_catalog.db')
 
 Base.metadata.create_all(engine)

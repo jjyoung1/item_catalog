@@ -1,10 +1,9 @@
-from models import Base, User, Product
-from flask import Flask, jsonify, request, url_for, abort, g
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import create_engine
-
+from flask import Flask, jsonify, request, abort, g
 from flask_httpauth import HTTPBasicAuth
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.models import Base, User
 
 auth = HTTPBasicAuth()
 
