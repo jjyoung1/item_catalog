@@ -1,5 +1,5 @@
 from models import Base, User, Product
-from flask import Flask, jsonify, render_template, request, url_for, abort, g, app
+from flask import Flask, jsonify, render_template, request, url_for, abort, g
 from flask_httpauth import HTTPBasicAuth
 from flask import session as login_session
 
