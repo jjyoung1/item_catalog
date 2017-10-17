@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 import random, string
 
+from config import config
+
 auth = HTTPBasicAuth()
 
 engine = create_engine('sqlite:///item_catalog.db')
@@ -17,7 +19,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 app = Flask(__name__)
-
 
 # ADD @auth.verify_password decorator here
 @auth.verify_password
@@ -121,7 +122,15 @@ def home():
     return ("Hello There")
 
 
+
 if __name__ == '__main__':
-    app.debug = True
-    app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    config_name = 'default'
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
+
+    from models import init_app as models_init_app
+    models_init_app(app)
+
     app.run(host='0.0.0.0', port=5000)
+
+

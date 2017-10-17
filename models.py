@@ -60,6 +60,8 @@ class Product(Base):
         }
 
 
-engine = create_engine('sqlite:///regalTree.db')
+def init_app(app):
+    global engine
 
-Base.metadata.create_all(engine)
+    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    Base.metadata.create_all(engine)
