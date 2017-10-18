@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip3 install --upgrade pip
     pip3 install flask packaging oauthlib flask-oauthlib
     pip3 install flask-httpauth
+    pip3 install flask-login
     pip3 install redis
     pip3 install passlib flask-httpauth
     pip3 install sqlalchemy flask-sqlalchemy psycopg2 bleach
@@ -41,6 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip2 install --upgrade pip
     pip2 install flask packaging oauthlib flask-oauthlib
     pip2 install flask-httpauth
+    pip2 install flask-login
     pip2 install redis
     pip2 install passlib flask-httpauth
     pip2 install sqlalchemy flask-sqlalchemy psycopg2 bleach
