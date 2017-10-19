@@ -66,22 +66,11 @@ def gconnect():
         auth_code)
 
     # Call Google API
-    http_auth = credentials.authorize(httplib2.Http())
+    # http_auth = credentials.authorize(httplib2.Http())
 
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
-    data = answer.json()
-    login_session['credentials'] = credentials.to_json()
-    # drive_service = discovery.build('drive', 'v3', http=http_auth)
-    # appfolder = drive_service.files().get(fileId='appfolder').execute()
-
-    # Get profile info from ID token
-    login_session['userid'] = credentials.id_token['sub']
-    login_session['email'] = credentials.id_token['email']
-    login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
 
     # try:
     #     # Upgrade the authorization code into a credentials object
@@ -94,56 +83,57 @@ def gconnect():
     #     response.headers['Content-Type'] = 'application/json'
     #     return response
     #
-    #     # Check that the access token is valid.
-    #     access_token = credentials.access_token
-    #     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-    #            % access_token)
-    #     h = httplib2.Http()
-    #     result = json.loads(h.request(url, 'GET')[1])
-    #     # If there was an error in the access token info, abort.
-    #     if result.get('error') is not None:
-    #         response = make_response(json.dumps(result.get('error')), 500)
-    #         response.headers['Content-Type'] = 'application/json'
-    #         return response
-    #
-    #     # Verify that the access token is used for the intended user.
-    #     gplus_id = credentials.id_token['sub']
-    #     if result['user_id'] != gplus_id:
-    #         response = make_response(
-    #             json.dumps("Token's user ID doesn't match given user ID."), 401)
-    #         response.headers['Content-Type'] = 'application/json'
-    #         return response
-    #
-    #     # Verify that the access token is valid for this app.
-    #     if result['issued_to'] != CLIENT_ID:
-    #         response = make_response(
-    #             json.dumps("Token's client ID does not match app's."), 401)
-    #         print("Token's client ID does not match app's.")
-    #         response.headers['Content-Type'] = 'application/json'
-    #         return response
-    #
-    #     stored_access_token = login_session.get('access_token')
-    #     stored_gplus_id = login_session.get('gplus_id')
-    #     if stored_access_token is not None and gplus_id == stored_gplus_id:
-    #         response = make_response(json.dumps('Current user is already connected.'),
-    #                                  200)
-    #         response.headers['Content-Type'] = 'application/json'
-    #         return response
-    #
-    #     # Store the access token in the session for later use.
-    #     login_session['access_token'] = credentials.access_token
-    #     login_session['gplus_id'] = gplus_id
-    #
-    #     # Get user info
-    #     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    #     params = {'access_token': credentials.access_token, 'alt': 'json'}
-    #     answer = requests.get(userinfo_url, params=params)
-    #
-    #     data = answer.json()
-    #
-    #     login_session['username'] = data['name']
-    #     login_session['picture'] = data['picture']
-    #     login_session['email'] = data['email']
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token
+    h = httplib2.Http()
+    # resp = h.request(url, 'GET')[1].decode("utf-8")
+    result = json.loads(h.request(url, 'GET')[1].decode("utf-8"))
+    # result = json.loads(h.request(url, 'GET')[1].decode("utf-8"))
+
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is used for the intended user.
+    google_id = credentials.id_token['sub']
+    if result['user_id'] != google_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this app.
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        print("Token's client ID does not match app's.")
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
+    stored_access_token = login_session.get('access_token')
+
+    stored_google_id = login_session.get('google_id')
+    if stored_access_token is not None and google_id == stored_google_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                     200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    data = answer.json()
+
+    # Store the access token in the session for later use.
+    login_session['access_token'] = credentials.access_token
+
+    # Get profile info from ID token
+    login_session['google_id'] = credentials.id_token['sub']
+    login_session['email'] = credentials.id_token['email']
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
 
     output = ''
     output += '<h1>Welcome, '
@@ -155,6 +145,7 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     return output  # ADD @auth.verify_password decorator here
+
 
 @auth.verify_password
 def verify_password(username_or_token, password):
