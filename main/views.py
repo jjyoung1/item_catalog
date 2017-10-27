@@ -1,12 +1,12 @@
-from models import Base, User, Product
 from flask import Flask, jsonify, render_template, request, url_for, abort, g, flash
 from flask_httpauth import HTTPBasicAuth
 from flask import session as login_session
-
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 import random, string
+
+import models
 
 # Imports for oauth
 from apiclient import discovery
@@ -19,6 +19,8 @@ import json  # Lib: Convert in-memory python objects to a serialized representat
 from flask import make_response
 import requests  # http library
 
+from . import main
+
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 
@@ -27,22 +29,22 @@ from config import config
 auth = HTTPBasicAuth()
 
 engine = create_engine('sqlite:///item_catalog.db')
-Base.metadata.bind = engine
+models.Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 
-@app.route('/login')
-def showLogin():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
-    login_session['state'] = state
-    return render_template("login.html", STATE=state)
+# @main.route('/login')
+# def showLogin():
+#     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+#     login_session['state'] = state
+#     return render_template("login.html", STATE=state)
 
 
-@app.route('/gconnect', methods=['POST'])
+@main.route('/gconnect', methods=['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 401)
@@ -114,13 +116,12 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
     stored_access_token = login_session.get('access_token')
 
     stored_google_id = login_session.get('google_id')
     if stored_access_token is not None and google_id == stored_google_id:
         response = make_response(json.dumps('Current user is already connected.'),
-                                     200)
+                                 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -146,7 +147,8 @@ def gconnect():
     print("done!")
     return output  # ADD @auth.verify_password decorator here
 
-@app.route("/gdisconnect")
+
+@main.route("/gdisconnect")
 def gdisconnect():
     # Only disconnect a connected user.
     access_token = login_session.get("access_token")
@@ -174,15 +176,16 @@ def gdisconnect():
         response.headers = 'application/json'
         return response
 
+
 @auth.verify_password
 def verify_password(username_or_token, password):
     # Check if a valid token was passed
-    user_id = User.verify_auth_token(username_or_token)
+    user_id = models.User.verify_auth_token(username_or_token)
     if user_id:
-        user = session.query(User).filter_by(id=user_id).one()
+        user = session.query(models.User).filter_by(id=user_id).one()
     else:
         # Attempt to get user from DB
-        user = session.query(User).filter_by(username=username_or_token).first()
+        user = session.query(models.User).filter_by(username=username_or_token).first()
         if not user or not user.verify_password(password):
             return False  # Return invalid user
     g.user = user
@@ -190,28 +193,34 @@ def verify_password(username_or_token, password):
 
 
 # add /token route here to get a token for a user with login credentials
-@app.route('/token')
+@main.route('/token')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token.decode('ascii')})
 
 
-@app.route('/users', methods=['POST'])
+@main.route('/users', methods=['POST'])
 def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
+    email = request.json.get('email')
     if username is None or password is None:
         print("missing arguments")
         abort(400)
 
-    if session.query(User).filter_by(username=username).first() is not None:
+    models.User.create({
+        'username': username,
+        'password': password,
+        'email': email,
+    })
+    if session.query(models.User).filter_by(username=username).first() is not None:
         print("existing user")
-        user = session.query(User).filter_by(username=username).first()
+        user = session.query(models.User).filter_by(username=username).first()
         return jsonify({
             'message': 'user already exists'}), 200  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
-    user = User(username=username)
+    user = models.User(username=username)
     user.hash_password(password)
     session.add(user)
     session.commit()
@@ -219,62 +228,65 @@ def new_user():
         {'username': user.username}), 201  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
-@app.route('/users/<int:id>')
+@main.route('/users/<int:id>')
 def get_user(id):
-    user = session.query(User).filter_by(id=id).one()
+    user = session.query(models.User).filter_by(id=id).one()
     if not user:
         abort(400)
     return jsonify({'username': user.username})
 
 
-@app.route('/resource')
+@main.route('/resource')
 @auth.login_required
 def get_resource():
     return jsonify({'data': 'Hello, %s!' % g.user.username})
 
 
-@app.route('/products', methods=['GET', 'POST'])
+@main.route('/products', methods=['GET', 'POST'])
 @auth.login_required
 def showAllProducts():
     if request.method == 'GET':
-        products = session.query(Product).all()
+        products = session.query(models.Product).all()
         return jsonify(products=[p.serialize for p in products])
     if request.method == 'POST':
         name = request.json.get('name')
         category = request.json.get('category')
         price = request.json.get('price')
-        newItem = Product(name=name, category=category, price=price)
+        newItem = models.Product(name=name, category=category, price=price)
         session.add(newItem)
         session.commit()
         return jsonify(newItem.serialize)
 
 
-@app.route('/products/<category>')
+@main.route('/products/<category>')
 @auth.login_required
 def showCategoriedProducts(category):
     if category == 'fruit':
-        fruit_items = session.query(Product).filter_by(category='fruit').all()
+        fruit_items = session.query(models.Product).filter_by(category='fruit').all()
         return jsonify(fruit_products=[f.serialize for f in fruit_items])
     if category == 'legume':
-        legume_items = session.query(Product).filter_by(category='legume').all()
+        legume_items = session.query(models.Product).filter_by(category='legume').all()
         return jsonify(legume_products=[l.serialize for l in legume_items])
     if category == 'vegetable':
-        vegetable_items = session.query(Product).filter_by(category='vegetable').all()
+        vegetable_items = session.query(models.Product).filter_by(category='vegetable').all()
         return jsonify(produce_products=[p.serialize for p in vegetable_items])
 
 
-@app.route('/', methods=['GET'])
+@main.route('/', methods=['GET'])
 def home():
     return ("Hello There")
 
 
-if __name__ == '__main__':
-    config_name = 'default'
-    app.config.from_object(config[config_name])
-    config[config_name].init_app(app)
+# if __name__ == '__main__':
+#     config_name = 'default'
+#     app.config.from_object(config[config_name])
+#     config[config_name].init_app(app)
+#
+#     from models import init_app as models_init_app
+#
+#     models_init_app(app)
+#
+#     app.run(host='0.0.0.0', port=5000)
 
-    from models import init_app as models_init_app
-
-    models_init_app(app)
-
-    app.run(host='0.0.0.0', port=5000)
+def init_app(app):
+    ''''''

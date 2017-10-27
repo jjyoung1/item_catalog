@@ -1,10 +1,12 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from passlib.apps import custom_app_context as pwd_context
 import random, string
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from validate_email import validate_email
 
 Base = declarative_base()
 
@@ -16,7 +18,9 @@ class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(32), index=True)
+    email = Column(String(64), index=True)
     password_hash = Column(String(64))
+    picture = Column(String(128))
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -42,6 +46,41 @@ class User(Base):
         user_id = data['id']
         return user_id
 
+    # Helper functions for User
+    #
+    # Create a new User
+    # Checks to see if the User already exists.  If not then it's
+    # created.  Otherwise it returns an error
+    @staticmethod
+    def create(**kargv):
+        ''''''
+        session = Session()
+
+        username = kargv.get('username')
+        password = kargv.get('password')
+        email = kargv.get('email')
+
+        # Confirm required arguments provided
+        if username is None:
+            raise ValueError("Missing required argument: username")
+        if password is None:
+            raise ValueError("Missing required argument: password")
+        if email is None or not validate_email(email) :
+            raise ValueError("Missing or illegal email address")
+
+        # Abort if user already exists
+        user = session.query(User).filter_by(email=email).one()
+        if user:
+            return None
+
+        # Create new user
+        user = User(username=username, password=password, email=email)
+
+        # Encrypt password
+        user.hash_password()
+        # Persist in database
+
+        session.remove()
 
 class Product(Base):
     __tablename__ = 'product'
@@ -62,6 +101,11 @@ class Product(Base):
 
 def init_app(app):
     global engine
+    global Session
 
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     Base.metadata.create_all(engine)
+
+    # Create factory for Scoped Sessions
+    session_factory = sessionmaker(bind = engine)
+    Session = scoped_session(session_factory)
