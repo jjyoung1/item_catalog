@@ -52,13 +52,13 @@ class User(Base):
     # Checks to see if the User already exists.  If not then it's
     # created.  Otherwise it returns an error
     @staticmethod
-    def create(**kargv):
+    def create(username, password, email):
         ''''''
         session = Session()
 
-        username = kargv.get('username')
-        password = kargv.get('password')
-        email = kargv.get('email')
+        # username = kwargs.get('username')
+        # password = kwargs.get('password')
+        # email = kwargs.get('email')
 
         # Confirm required arguments provided
         if username is None:

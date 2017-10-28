@@ -1,9 +1,11 @@
-from flask import Flask, url_for
-from config import config
 import json
 
+from flask import Flask, url_for
+
+from app.config import config
+
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open('../client_secrets.json', 'r').read())['web']['client_id']
 
 app = Flask(__name__)
 
@@ -39,13 +41,13 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    from main import main as main_blueprint
+    from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from models import init_app as models_init_app
+    from app.models import init_app as models_init_app
     models_init_app(app)
 
-    from auth import auth as auth_blueprint
+    from app.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
