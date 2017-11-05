@@ -7,8 +7,12 @@ from passlib.apps import custom_app_context as pwd_context
 import random, string
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from validate_email import validate_email
+from . import Base, Session
 
-Base = declarative_base()
+# Database connections and Session management is handled through Flask.g
+# TODO: refactor to improve separation of database from Flask framework
+from flask import g
+from werkzeug.local import LocalProxy
 
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -65,22 +69,37 @@ class User(Base):
             raise ValueError("Missing required argument: username")
         if password is None:
             raise ValueError("Missing required argument: password")
-        if email is None or not validate_email(email) :
+        if email is None or not validate_email(email):
             raise ValueError("Missing or illegal email address")
 
         # Abort if user already exists
         user = session.query(User).filter_by(email=email).one()
         if user:
-            return None
+            raise ValueError("User already exists")
+
+        # TODO: Add additional validation on password strength
 
         # Create new user
         user = User(username=username, password=password, email=email)
 
         # Encrypt password
-        user.hash_password()
-        # Persist in database
+        user.hash_password(password)
 
+        # Persist in database
+        session.commit()
         session.remove()
+
+    @staticmethod
+    def getID(email):
+        session = Session()
+        try:
+            user = session.query(User.filter_by(email=email).one())
+            return user.id
+        except:
+            return None
+        finally:
+            session.remove()
+
 
 class Product(Base):
     __tablename__ = 'product'
@@ -100,12 +119,8 @@ class Product(Base):
 
 
 def init_app(app):
-    global engine
-    global Session
-
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     Base.metadata.create_all(engine)
 
     # Create factory for Scoped Sessions
-    session_factory = sessionmaker(bind = engine)
-    Session = scoped_session(session_factory)
+    Session = scoped_session(sessionmaker(bind=engine))

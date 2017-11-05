@@ -14,10 +14,6 @@ from . import auth
 CLIENT_ID = json.loads(
     open('../client_secrets.json', 'r').read())['web']['client_id']
 
-@auth.route('/login2')
-def login2():
-    return "Called login2"
-
 @auth.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))

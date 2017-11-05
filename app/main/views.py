@@ -16,11 +16,11 @@ CLIENT_ID = json.loads(
 
 auth = HTTPBasicAuth()
 
-engine = create_engine('sqlite:///item_catalog.db')
-models.Base.metadata.bind = engine
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+# engine = create_engine('sqlite:///item_catalog.db')
+# models.Base.metadata.bind = engine
+#
+# DBSession = sessionmaker(bind=engine)
+# session = DBSession()
 
 
 @auth.verify_password
