@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, url_for
+from flask import Flask, url_for, g
 
 from app.config import config
 
@@ -14,7 +14,6 @@ def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else()
     arguments = rule.arguments if rule.arguments is not None else()
     return len(defaults) >= len(arguments)
-
 
 @app.route("/site-map")
 def site_map():
@@ -51,6 +50,18 @@ def create_app(config_name):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
+
+@app.before_request
+def before_request():
+    from app.models import DBSession
+    if not hasattr(g,'db_session'):
+        g.db_session = DBSession()
+
+@app.teardown_appcontext
+def close_session(error):
+    from app.models import DBSession
+    if hasattr(g,'db_session'):
+        g.db_session.close()
 
 
 if __name__ == '__main__':

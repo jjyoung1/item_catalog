@@ -28,10 +28,10 @@ def verify_password(username_or_token, password):
     # Check if a valid token was passed
     user_id = models.User.verify_auth_token(username_or_token)
     if user_id:
-        user = session.query(models.User).filter_by(id=user_id).one()
+        user = g.session.query(models.User).filter_by(id=user_id).one()
     else:
         # Attempt to get user from DB
-        user = session.query(models.User).filter_by(username=username_or_token).first()
+        user = g.session.query(models.User).filter_by(username=username_or_token).first()
         if not user or not user.verify_password(password):
             return False  # Return invalid user
     g.user = user
@@ -57,23 +57,23 @@ def new_user():
 
     models.User.create(username, password, email)
 
-    if session.query(models.User).filter_by(username=username).first() is not None:
+    if g.session.query(models.User).filter_by(username=username).first() is not None:
         print("existing user")
-        user = session.query(models.User).filter_by(username=username).first()
+        user = g.session.query(models.User).filter_by(username=username).first()
         return jsonify({
             'message': 'user already exists'}), 200  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
     user = models.User(username=username)
     user.hash_password(password)
-    session.add(user)
-    session.commit()
+    g.session.add(user)
+    g.session.commit()
     return jsonify(
         {'username': user.username}), 201  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
 @main.route('/users/<int:id>')
 def get_user(id):
-    user = session.query(models.User).filter_by(id=id).one()
+    user = g.session.query(models.User).filter_by(id=id).one()
     if not user:
         abort(400)
     return jsonify({'username': user.username})
@@ -89,15 +89,15 @@ def get_resource():
 @auth.login_required
 def showAllProducts():
     if request.method == 'GET':
-        products = session.query(models.Product).all()
+        products = g.session.query(models.Product).all()
         return jsonify(products=[p.serialize for p in products])
     if request.method == 'POST':
         name = request.json.get('name')
         category = request.json.get('category')
         price = request.json.get('price')
         newItem = models.Product(name=name, category=category, price=price)
-        session.add(newItem)
-        session.commit()
+        g.session.add(newItem)
+        g.session.commit()
         return jsonify(newItem.serialize)
 
 
@@ -105,13 +105,13 @@ def showAllProducts():
 @auth.login_required
 def showCategoriedProducts(category):
     if category == 'fruit':
-        fruit_items = session.query(models.Product).filter_by(category='fruit').all()
+        fruit_items = g.session.query(models.Product).filter_by(category='fruit').all()
         return jsonify(fruit_products=[f.serialize for f in fruit_items])
     if category == 'legume':
-        legume_items = session.query(models.Product).filter_by(category='legume').all()
+        legume_items = g.session.query(models.Product).filter_by(category='legume').all()
         return jsonify(legume_products=[l.serialize for l in legume_items])
     if category == 'vegetable':
-        vegetable_items = session.query(models.Product).filter_by(category='vegetable').all()
+        vegetable_items = g.session.query(models.Product).filter_by(category='vegetable').all()
         return jsonify(produce_products=[p.serialize for p in vegetable_items])
 
 

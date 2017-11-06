@@ -10,6 +10,7 @@ from flask import session as login_session
 from oauth2client import client
 
 from . import auth
+from ..models import User
 
 CLIENT_ID = json.loads(
     open('../client_secrets.json', 'r').read())['web']['client_id']
@@ -43,24 +44,9 @@ def gconnect():
         ['profile', 'email'],
         auth_code)
 
-    # Call Google API
-    # http_auth = credentials.authorize(httplib2.Http())
-
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
-    # try:
-    #     # Upgrade the authorization code into a credentials object
-    #     oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-    #     oauth_flow.redirect_uri = 'postmessage'
-    #     credentials = oauth_flow.step2_exchange(code)
-    # except FlowExchangeError:
-    #     response = make_response(json.dumps('Failed to upgrade the'
-    #                                         'authorization code.'), 401)
-    #     response.headers['Content-Type'] = 'application/json'
-    #     return response
-    #
 
     # Check that the access token is valid.
     access_token = credentials.access_token
@@ -111,6 +97,11 @@ def gconnect():
     login_session['email'] = credentials.id_token['email']
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
+
+    user_id = User.getID(login_session['email'])
+    if not user_id:
+        user_id = User.create(login_session)
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
