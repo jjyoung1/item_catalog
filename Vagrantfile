@@ -6,6 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
+  # config.vm.provision :shell, path: "pg_config.sh"
   config.vm.box = "bento/ubuntu-16.04-i386"
   config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
@@ -29,22 +30,41 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     apt-get -qqy install python3 python3-pip
     pip3 install --upgrade pip
     pip3 install flask packaging oauthlib flask-oauthlib
-    #pip3 install redis
+    pip3 install flask-httpauth
+    pip3 install flask-login
+    pip3 install redis
     pip3 install passlib flask-httpauth
     pip3 install sqlalchemy flask-sqlalchemy psycopg2 bleach
     pip3 install httplib2
     pip3 install oauth2client
+    pip3 install validate_email
 
     apt-get -qqy install python python-pip
     pip2 install --upgrade pip
     pip2 install flask packaging oauthlib flask-oauthlib
+    pip2 install flask-httpauth
+    pip2 install flask-login
+    pip2 install redis
     pip2 install passlib flask-httpauth
     pip2 install sqlalchemy flask-sqlalchemy psycopg2 bleach
     pip2 install httplib2
     pip2 install oauth2client
+    pip2 install validate_email
+
+    # su postgres -c 'createuser -dRS vagrant'
+    # su vagrant -c 'createdb'
+    # su vagrant -c 'createdb news'
+    #su vagrant -c 'createdb forum'
+    # su vagrant -c 'psql forum -f /vagrant/forum/forum.sql'
 
     vagrantTip="[35m[1mThe shared directory is located at /vagrant\\nTo access your shared files: cd /vagrant[m"
     echo -e $vagrantTip > /etc/motd
+
+    wget http://download.redis.io/redis-stable.tar.gz
+    tar xvzf redis-stable.tar.gz
+    cd redis-stable
+    make
+    make install
 
     echo "Done installing your virtual machine!"
   SHELL
