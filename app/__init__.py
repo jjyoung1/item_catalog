@@ -16,11 +16,14 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    from app.main import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    bootstrap.init_app(app)
+    moment.init_app(app)
 
     from app.models import init_app as models_init_app
     models_init_app(app)
+
+    from app.main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
 
     from app.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
