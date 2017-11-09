@@ -13,7 +13,7 @@ from . import auth
 from ..models import User
 
 CLIENT_ID = json.loads(
-    open('../client_secrets.json', 'r').read())['web']['client_id']
+    open('client_secrets.json', 'r').read())['web']['client_id']
 
 @auth.route('/login')
 def showLogin():
@@ -36,7 +36,7 @@ def gconnect():
 
     # Set path to the Web application client_secret_*.json file you downloaded from the
     # Google API Console: https://console.developers.google.com/apis/credentials
-    CLIENT_SECRET_FILE = '../client_secrets.json'
+    CLIENT_SECRET_FILE = 'client_secrets.json'
 
     # Exchange auth code for access token, refresh token, and ID token
     credentials = client.credentials_from_clientsecrets_and_code(
@@ -52,9 +52,7 @@ def gconnect():
     access_token = credentials.access_token
     url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token
     h = httplib2.Http()
-    # resp = h.request(url, 'GET')[1].decode("utf-8")
     result = json.loads(h.request(url, 'GET')[1].decode("utf-8"))
-    # result = json.loads(h.request(url, 'GET')[1].decode("utf-8"))
 
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
@@ -145,7 +143,6 @@ def gdisconnect():
 
 @auth.route('/fbconnect', methods=['POST'])
 def fbconnect():
-    request_state = request.args.get('state')
     if (request.args.get('state')) != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -153,7 +150,6 @@ def fbconnect():
     access_token = request.data.decode()
 
     # Exchange client token for long-lived server-side token
-    # json_cl_sec = json.loads(open('/vagrant/fb_client_secrets.json', 'r').read())
     app_id = json.loads(open('/vagrant/fb_client_secrets.json', 'r').read())['web']['app_id']
     app_secret = json.loads(open('/vagrant/fb_client_secrets.json', 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/v2.10/oauth/' \
@@ -166,7 +162,6 @@ def fbconnect():
     # Use token to get user info from API
     # userinfo_url = "https://graph.facebook.com/V2.10/me"
     token = "access_token=" + data['access_token']
-    # url = '%s?%s' % (userinfo_url, token)
     url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture' % token
 
     h = httplib2.Http()
@@ -182,20 +177,13 @@ def fbconnect():
     login_session['picture'] = data['picture']['data']['url']
     login_session['access_token'] = access_token
 
-    # Get user picture
-    # url = "%s/picture?%s&redirect-0&height=200&width=200" %(userinfo_url, token)
-    # h = httplib2.Http()
-    # result = h.request(url, 'GET')[1]
-    # data = json.loads(result)
-    #
-    # login_session['picture'] = data["data"]["url"]
-
     # see if user exists, if it doesn't make a new one
     user_id = User.getID(login_session['email'])
     if not user_id:
         user_id = User.create(login_session)
     login_session['user_id'] = user_id
 
+    # TODO: change this to a reasonable redirection
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']

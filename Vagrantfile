@@ -38,6 +38,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip3 install httplib2
     pip3 install oauth2client
     pip3 install validate_email
+    pip3 install coverage
+    pip3 install flask-script
 
     apt-get -qqy install python python-pip
     pip2 install --upgrade pip
@@ -50,6 +52,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip2 install httplib2
     pip2 install oauth2client
     pip2 install validate_email
+    pip2 install coverage
+    pip2 install flask-script
 
     # su postgres -c 'createuser -dRS vagrant'
     # su vagrant -c 'createdb'

@@ -1,18 +1,20 @@
 import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
-from flask import jsonify, request, abort, g
+from flask import url_for, jsonify, request, abort, g
+
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app import models
+from app import has_no_empty_params
 from . import main
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
 
 CLIENT_ID = json.loads(
-    open('../client_secrets.json', 'r').read())['web']['client_id']
+    open('client_secrets.json', 'r').read())['web']['client_id']
 
 auth = HTTPBasicAuth()
 
@@ -118,6 +120,26 @@ def showCategoriedProducts(category):
 @main.route('/', methods=['GET'])
 def home():
     return ("Hello There")
+
+@main.route("/site-map")
+def site_map():
+    links = []
+    for rule in main.url_map.iter_rules():
+
+        if "GET" in rule.methods and has_no_empty_params(rule):
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+            links.append((url, rule.endpoint))
+    str = ''
+    str += '<h1>url rules</h1>'
+    str += '<ul>'
+    for link in links:
+        url, func = link
+        str += "<li>"\
+               + url + ': ' + func + \
+        "</li>"
+
+    str += '</ul>'
+    return str
 
 
 def init_app(app):
