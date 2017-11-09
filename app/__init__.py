@@ -1,9 +1,15 @@
 from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 from config import config
 import json
 
+bootstrap = Bootstrap()
+moment = Moment()
+
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
+
 
 def create_app(config_name):
     app = Flask(__name__)
