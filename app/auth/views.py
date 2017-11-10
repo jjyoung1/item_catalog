@@ -4,7 +4,7 @@ import string
 
 import httplib2  # http client library
 import requests  # http library
-from flask import render_template, request, make_response, abort, flash
+from flask import render_template, request, make_response, abort, flash, redirect, url_for
 from flask import session as login_session
 # from apiclient import discovery
 from oauth2client import client
@@ -20,6 +20,19 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
     return render_template("auth/login.html", STATE=state)
+
+# TODO: Improve on logout response to user
+@auth.route('/logout', methods=['GET','POST'])
+def logout():
+    if not login_session.get('username'):
+        flash("You are not logged in")
+        return redirect(url_for('main.home'))
+    else:
+        if login_session.get('google_id'):
+            return redirect(url_for('auth.gdisconnect'))
+        else:
+            return redirect(url_for('auth.fbdisconnect'))
+
 
 @auth.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -205,5 +218,13 @@ def fbdisconnect():
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
+
+    del login_session['provider']
+    del login_session['username']
+    del login_session['email']
+    del login_session['facebook_id']
+    del login_session['picture']
+    del login_session['access_token']
+
     return "you have been logged out"
 

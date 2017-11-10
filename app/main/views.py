@@ -1,6 +1,6 @@
 import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
-from flask import url_for, jsonify, request, abort, g
+from flask import url_for, jsonify, request, abort, g, render_template
 
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
@@ -119,7 +119,7 @@ def showCategoriedProducts(category):
 
 @main.route('/', methods=['GET'])
 def home():
-    return ("Hello There")
+    return render_template("home.html")
 
 @main.route("/site-map")
 def site_map():
