@@ -1,0 +1,8 @@
+
+.image-tn {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+}

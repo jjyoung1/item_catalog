@@ -5,7 +5,7 @@ import string
 import httplib2  # http client library
 import requests  # http library
 from flask import render_template, request, make_response, abort, flash, redirect, url_for
-from flask import session as login_session
+from flask import session as login_session, jsonify
 # from apiclient import discovery
 from oauth2client import client
 
@@ -114,17 +114,17 @@ def gconnect():
         user_id = User.create(login_session)
     login_session['user_id'] = user_id
 
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print("done!")
-    return output  # ADD @auth.verify_password decorator here
-
+    # output = ''
+    # output += '<h1>Welcome, '
+    # output += login_session['username']
+    # output += '!</h1>'
+    # output += '<img src="'
+    # output += login_session['picture']
+    # output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    # flash("you are now logged in as %s" % login_session['username'])
+    # print("done!")
+    # return output  # ADD @auth.verify_password decorator here
+    return redirect(url_for('main.home'))
 
 @auth.route("/gdisconnect")
 def gdisconnect():
@@ -196,24 +196,26 @@ def fbconnect():
         user_id = User.create(login_session)
     login_session['user_id'] = user_id
 
-    # TODO: change this to a reasonable redirection
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: ' \
-              '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    # # TODO: change this to a reasonable redirection
+    # output = ''
+    # output += '<h1>Welcome, '
+    # output += login_session['username']
+    # output += '!</h1>'
+    # output += '<img src="'
+    # output += login_session['picture']
+    # output += ' " style = "width: 300px; height: 300px;border-radius: ' \
+    #           '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
-    return output
+    # return output
+    return jsonify("Login via Facebook successful!")
+
 
 @auth.route('/fbdisconnect')
 def fbdisconnect():
-    facebook_id  = login_session['facebook_id']
+    facebook_id  = login_session.get('facebook_id')
     # The access token must be included to successfully logout
-    access_token = login_session['access_token']
+    access_token = login_session.get('access_token')
 
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
     h = httplib2.Http()

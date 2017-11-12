@@ -1,17 +1,31 @@
 {% extends "bootstrap/base.html" %}
 
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/styles.css') }}">
+{% endblock %}
+
 {% block title %}Catalog{% endblock %}
 
 {% block navbar %}
-    <div class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                {% if session.username %}
-                    <p>Signed in as: {{ session.username }}</p>
-                    <a href="{{ url_for('auth.logout') }}">Sign Out</a>
-                {% else %}
-                    <a href="{{ url_for('auth.showLogin') }}">Log In</a>
-                {% endif %}
+    <div class="navbar-header">
+        <div class="navbar navbar-default" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if session.username %}
+                            <p>
+                                Signed in: {{ session.username }}
+                                <img class="image-tn" src="{{ session.picture }}">
+                            </p>
+                            <a href="{{ url_for('auth.logout') }}">Sign Out</a>
+                        {% else %}
+                            <a href="{{ url_for('auth.showLogin') }}">Log In</a>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

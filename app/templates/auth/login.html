@@ -60,10 +60,10 @@
                     if (result) {
                         // Handle or verify the server response.
                         //alert("Server internal error: Unable to process Google login")
-                        $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
-                        setTimeout(function () {
+{#                        $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')#}
+{#                        setTimeout(function () {#}
                             window.location.href = "/";
-                        }, 4000);
+{#                        }, 4000);#}
                     } else if (authResult['error']) {
                         console.log('There was an error: ' + authResult['error']);
                     } else {
@@ -143,10 +143,10 @@ function sendTokenToServer() {
             success: function (result) {
                 // Handle or verify the server response if necessary.
                 if (result) {
-                    $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
-                    setTimeout(function () {
+{#                    $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')#}
+{#                    setTimeout(function () {#}
                         window.location.href = "/";
-                    }, 4000);
+{#                    }, 4000);#}
 
 
                 } else {
