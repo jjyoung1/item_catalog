@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip3 install redis
     pip3 install passlib flask-httpauth
     pip3 install sqlalchemy flask-sqlalchemy psycopg2 bleach
+    pip3 install flask-wtf
     pip3 install httplib2
     pip3 install oauth2client
     pip3 install validate_email
@@ -51,6 +52,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     pip2 install redis
     pip2 install passlib flask-httpauth
     pip2 install sqlalchemy flask-sqlalchemy psycopg2 bleach
+    pip2 install flask-wtf
     pip2 install httplib2
     pip2 install oauth2client
     pip2 install validate_email

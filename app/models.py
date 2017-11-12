@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relationship, sessionmaker
@@ -85,20 +85,35 @@ class User(Base):
         return g.db_session(User).filter_by(id=user_id).one()
 
 
-class Product(Base):
-    __tablename__ = 'product'
+class Category(Base):
+    __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    category = Column(String)
-    price = Column(String)
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
             'name': self.name,
-            'category': self.category,
-            'price': self.price
+        }
+
+
+class Item(Base):
+    ''''''
+    __tablename__ = 'item'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    description = Column(String(512))
+    category_id = Column(Integer, ForeignKey('category.id'))
+    category = relationship(Category)
+
+    @property
+    def serialize(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'id': self.id,
+            'category': self.category_id,
         }
 
 

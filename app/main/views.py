@@ -1,6 +1,6 @@
 import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
-from flask import url_for, jsonify, request, abort, g, render_template
+from flask import url_for, jsonify, request, abort, g, render_template, flash
 
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from app import models
 from app import has_no_empty_params
 from . import main
+from .forms import CategoryForm, ItemForm
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
@@ -17,6 +18,7 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 
 auth = HTTPBasicAuth()
+
 
 # engine = create_engine('sqlite:///item_catalog.db')
 # models.Base.metadata.bind = engine
@@ -73,35 +75,35 @@ def new_user():
         {'username': user.username}), 201  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
-@main.route('/users/<int:id>')
-def get_user(id):
-    user = g.db_session.query(models.User).filter_by(id=id).one()
-    if not user:
-        abort(400)
-    return jsonify({'username': user.username})
+# @main.route('/users/<int:id>')
+# def get_user(id):
+#     user = g.db_session.query(models.User).filter_by(id=id).one()
+#     if not user:
+#         abort(400)
+#     return jsonify({'username': user.username})
+#
 
+# @main.route('/resource')
+# @auth.login_required
+# def get_resource():
+#     return jsonify({'data': 'Hello, %s!' % g.user.username})
+#
 
-@main.route('/resource')
-@auth.login_required
-def get_resource():
-    return jsonify({'data': 'Hello, %s!' % g.user.username})
-
-
-@main.route('/products', methods=['GET', 'POST'])
-@auth.login_required
-def showAllProducts():
-    if request.method == 'GET':
-        products = g.db_session.query(models.Product).all()
-        return jsonify(products=[p.serialize for p in products])
-    if request.method == 'POST':
-        name = request.json.get('name')
-        category = request.json.get('category')
-        price = request.json.get('price')
-        newItem = models.Product(name=name, category=category, price=price)
-        g.db_session.add(newItem)
-        g.db_session.commit()
-        return jsonify(newItem.serialize)
-
+# @main.route('/products', methods=['GET', 'POST'])
+# @auth.login_required
+# def showAllProducts():
+#     if request.method == 'GET':
+#         products = g.db_session.query(models.Product).all()
+#         return jsonify(products=[p.serialize for p in products])
+#     if request.method == 'POST':
+#         name = request.json.get('name')
+#         category = request.json.get('category')
+#         price = request.json.get('price')
+#         newItem = models.Product(name=name, category=category, price=price)
+#         g.db_session.add(newItem)
+#         g.db_session.commit()
+#         return jsonify(newItem.serialize)
+#
 
 @main.route('/products/<category>')
 @auth.login_required
@@ -121,6 +123,27 @@ def showCategoriedProducts(category):
 def home():
     return render_template("home.html")
 
+@main.route('/newitem', methods=['GET','POST'])
+def newitem():
+    name = None
+    description = None
+    category = None
+    form = ItemForm()
+    form.category.choices = [('1', 'Kitchen'), ('2', 'Landscaping')]
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+        category = form.category.data
+        flash("Item {} created".format(name))
+    return render_template('item_form.html', form=form, name=name, description = description, category=category)
+
+@main.route('/newcategory', methods=['GET','POST'])
+def newcategory():
+    form = CategoryForm()
+    name = None
+    return render_template('item_form.html', form=form, name=name)
+
+
 @main.route("/site-map")
 def site_map():
     links = []
@@ -134,9 +157,9 @@ def site_map():
     str += '<ul>'
     for link in links:
         url, func = link
-        str += "<li>"\
+        str += "<li>" \
                + url + ': ' + func + \
-        "</li>"
+               "</li>"
 
     str += '</ul>'
     return str
