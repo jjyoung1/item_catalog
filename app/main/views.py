@@ -1,6 +1,7 @@
 import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
 from flask import url_for, jsonify, request, abort, g, render_template, flash
+from flask import current_app
 
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
@@ -147,7 +148,7 @@ def newcategory():
 @main.route("/site-map")
 def site_map():
     links = []
-    for rule in main.url_map.iter_rules():
+    for rule in current_app.url_map.iter_rules():
 
         if "GET" in rule.methods and has_no_empty_params(rule):
             url = url_for(rule.endpoint, **(rule.defaults or {}))
