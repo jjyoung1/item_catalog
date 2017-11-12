@@ -228,5 +228,5 @@ def fbdisconnect():
     del login_session['picture']
     del login_session['access_token']
 
-    return "you have been logged out"
+    return render_template(url_for('main/home'))
 
