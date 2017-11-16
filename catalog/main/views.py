@@ -1,16 +1,18 @@
 import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
 from flask import url_for, jsonify, request, abort, g, render_template, flash
-from flask import current_app
+from flask import current_app, redirect
 
 from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
-from app import models
-from app import has_no_empty_params
+from catalog import models
+from catalog import has_no_empty_params
 from . import main
 from .forms import CategoryForm, ItemForm
+from ..models import Category
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
@@ -124,7 +126,8 @@ def showCategoriedProducts(category):
 def home():
     return render_template("home.html")
 
-@main.route('/newitem', methods=['GET','POST'])
+
+@main.route('/newitem', methods=['GET', 'POST'])
 def newitem():
     name = None
     description = None
@@ -136,13 +139,28 @@ def newitem():
         description = form.description.data
         category = form.category.data
         flash("Item {} created".format(name))
-    return render_template('item_form.html', form=form, name=name, description = description, category=category)
+        return redirect(url_for('main.home'))
+    return render_template('item_form.html', form=form, name=name, description=description, category=category)
 
-@main.route('/newcategory', methods=['GET','POST'])
+
+@main.route('/newcategory', methods=['GET', 'POST'])
 def newcategory():
     form = CategoryForm()
-    name = None
-    return render_template('item_form.html', form=form, name=name)
+    category_name = None
+    if form.validate_on_submit():
+        try:
+            category_name = form.category_name.data
+            category = Category(name=category_name)
+            g.db_session.add(category)
+            g.db_session.commit()
+            flash("{} Category created".format(category_name))
+            return redirect(url_for('main.home'))
+        except IntegrityError as e:
+            print(type(e))
+            print(e.args)
+            print(e)
+            flash("Error: Duplicate category: {} already exists".format(category_name))
+    return render_template('item_form.html', form=form, name=category_name)
 
 
 @main.route("/site-map")

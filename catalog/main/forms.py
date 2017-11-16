@@ -3,7 +3,7 @@ from wtforms import StringField, SubmitField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
 class CategoryForm(Form):
-    name = StringField("Category Name", validators=[DataRequired()])
+    category_name = StringField("Category Name", validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class ItemForm(Form):

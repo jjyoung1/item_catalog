@@ -26,7 +26,7 @@ class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False)
-    email = Column(String(64), nullable=False)
+    email = Column(String(64), nullable=False, unique=True)
     picture = Column(String(250))
 
     # Add a method to generate auth tokens here
@@ -88,7 +88,7 @@ class User(Base):
 class Category(Base):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, nullable=False, unique=True)
 
     @property
     def serialize(self):
@@ -96,6 +96,24 @@ class Category(Base):
         return {
             'name': self.name,
         }
+
+    # @staticmethod
+    # def create(category_name):
+    #     assert category_name
+    #     try:
+    #         category = Category(category_name)
+    #         g.db_session.add(category)
+    #         g.db_session.commit()
+    #         category = g.db_session.query.filter(name=category_name).one()
+    #         return category
+    #
+    #     except Exception as e:
+    #         print(type(e))
+    #         print(e.args)
+    #         print(e)
+    #         return None
+
+
 
 
 class Item(Base):
