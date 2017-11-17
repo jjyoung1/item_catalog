@@ -13,45 +13,13 @@ from catalog import has_no_empty_params
 from . import main
 from .forms import CategoryForm, ItemForm
 from ..models import Category
+from ..auth.views import basic_auth as auth
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-
-auth = HTTPBasicAuth()
-
-
-# engine = create_engine('sqlite:///item_catalog.db')
-# models.Base.metadata.bind = engine
-#
-# DBSession = sessionmaker(bind=engine)
-# db_session = DBSession()
-
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # Check if a valid token was passed
-    user_id = models.User.verify_auth_token(username_or_token)
-    if user_id:
-        user = g.db_session.query(models.User).filter_by(id=user_id).one()
-    else:
-        # Attempt to get user from DB
-        user = g.db_session.query(models.User).filter_by(username=username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False  # Return invalid user
-    g.user = user
-    return True  # Return valid user
-
-
-# add /token route here to get a token for a user with login credentials
-@main.route('/token')
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii')})
-
 
 @main.route('/users', methods=['POST'])
 def new_user():
@@ -87,7 +55,7 @@ def new_user():
 #
 
 # @main.route('/resource')
-# @auth.login_required
+# @basic_auth.login_required
 # def get_resource():
 #     return jsonify({'data': 'Hello, %s!' % g.user.username})
 #
@@ -107,20 +75,6 @@ def new_user():
 #         g.db_session.commit()
 #         return jsonify(newItem.serialize)
 #
-
-@main.route('/products/<category>')
-@auth.login_required
-def showCategoriedProducts(category):
-    if category == 'fruit':
-        fruit_items = g.db_session.query(models.Product).filter_by(category='fruit').all()
-        return jsonify(fruit_products=[f.serialize for f in fruit_items])
-    if category == 'legume':
-        legume_items = g.db_session.query(models.Product).filter_by(category='legume').all()
-        return jsonify(legume_products=[l.serialize for l in legume_items])
-    if category == 'vegetable':
-        vegetable_items = g.db_session.query(models.Product).filter_by(category='vegetable').all()
-        return jsonify(produce_products=[p.serialize for p in vegetable_items])
-
 
 @main.route('/', methods=['GET'])
 def home():
@@ -144,6 +98,7 @@ def newitem():
 
 
 @main.route('/newcategory', methods=['GET', 'POST'])
+@auth.login_required
 def newcategory():
     form = CategoryForm()
     category_name = None

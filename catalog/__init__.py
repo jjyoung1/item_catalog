@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
+from flask_login import LoginManager
 from config import config
 import json
 
 bootstrap = Bootstrap()
 moment = Moment()
+login_manager = LoginManager()
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -26,7 +28,9 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
 
     from catalog.auth import auth as auth_blueprint
+    from catalog.auth.views import init_app as auth_init_app
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    auth_init_app(app)
 
     return app
 

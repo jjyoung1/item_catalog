@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import random, string
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from flask import g
+from passlib.apps import custom_app_context as pwd_context
 
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -26,13 +27,21 @@ class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False)
+    # password_hash = Column(String(64))
     email = Column(String(64), nullable=False, unique=True)
     picture = Column(String(250))
 
+    # def hash_password(self, password):
+    #     self.password_hash = pwd_context.encrypt(password)
+    #
+    # def verify_password(self, password):
+    #     return pwd_context.verify(password, self.password_hash)
+    #
     # Add a method to generate auth tokens here
     def generate_auth_token(self):
         s = Serializer(secret_key, expires_in=6000)
         return s.dumps({'id': self.id})
+
 
     # Add a method to verify auth tokens here
     @staticmethod

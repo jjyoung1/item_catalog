@@ -4,16 +4,48 @@ import string
 
 import httplib2  # http client library
 import requests  # http library
-from flask import render_template, request, make_response, abort, flash, redirect, url_for
+from flask import render_template, request, make_response, abort, flash, \
+    redirect, url_for, g
 from flask import session as login_session, jsonify
+from flask_httpauth import HTTPBasicAuth
 # from apiclient import discovery
+from flask_login import LoginManager
 from oauth2client import client
 
-from . import auth
 from ..models import User
+from . import auth, basic_auth
+
+
+# login_manager = LoginManager()
+# login_manager.login_view = 'auth.showLogin'
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
+
+
+
+@basic_auth.verify_password
+def verify_password(username_or_token, password):
+    # Check if a valid token was passed
+    user_id = User.verify_auth_token(username_or_token)
+    if user_id:
+        user = g.db_session.query(User).filter_by(id=user_id).one()
+    else:
+        # Attempt to get user from DB
+        user = g.db_session.query(User).filter_by(username=username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False  # Return invalid user
+    g.user = user
+    return True  # Return valid user
+
+
+# add /token route here to get a token for a user with login credentials
+@auth.route('/token')
+@basic_auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({'token': token.decode('ascii')})
+
 
 @auth.route('/login')
 def showLogin():
@@ -21,8 +53,9 @@ def showLogin():
     login_session['state'] = state
     return render_template("auth/login.html", STATE=state)
 
+
 # TODO: Improve on logout response to user
-@auth.route('/logout', methods=['GET','POST'])
+@auth.route('/logout', methods=['GET', 'POST'])
 def logout():
     if not login_session.get('username'):
         flash("You are not logged in")
@@ -126,6 +159,7 @@ def gconnect():
     # return output  # ADD @auth.verify_password decorator here
     return redirect(url_for('main.home'))
 
+
 @auth.route("/gdisconnect")
 def gdisconnect():
     # Only disconnect a connected user.
@@ -154,6 +188,7 @@ def gdisconnect():
         response.headers = 'application/json'
         return response
 
+
 @auth.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if (request.args.get('state')) != login_session['state']:
@@ -169,7 +204,7 @@ def fbconnect():
           'access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s' \
           '&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     h = httplib2.Http()
-    result =  h.request(url,'GET')[1]
+    result = h.request(url, 'GET')[1]
     data = json.loads(result.decode())
 
     # Use token to get user info from API
@@ -181,7 +216,7 @@ def fbconnect():
     result = h.request(url, 'GET')[1]
 
     print("url sent for API access:%s" % url)
-    print("API JSON reuslt: %s" %result)
+    print("API JSON reuslt: %s" % result)
     data = json.loads(result.decode())
     login_session['provider'] = 'facebook'
     login_session['username'] = data['name']
@@ -213,7 +248,7 @@ def fbconnect():
 
 @auth.route('/fbdisconnect')
 def fbdisconnect():
-    facebook_id  = login_session.get('facebook_id')
+    facebook_id = login_session.get('facebook_id')
     # The access token must be included to successfully logout
     access_token = login_session.get('access_token')
 
@@ -230,3 +265,6 @@ def fbdisconnect():
 
     return render_template(url_for('main/home'))
 
+def init_app(app):
+    ''''''
+    # basic_auth.init_app(app)
