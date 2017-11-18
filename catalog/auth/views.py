@@ -147,16 +147,6 @@ def gconnect():
         user_id = User.create(login_session)
     login_session['user_id'] = user_id
 
-    # output = ''
-    # output += '<h1>Welcome, '
-    # output += login_session['username']
-    # output += '!</h1>'
-    # output += '<img src="'
-    # output += login_session['picture']
-    # output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    # flash("you are now logged in as %s" % login_session['username'])
-    # print("done!")
-    # return output  # ADD @auth.verify_password decorator here
     return redirect(url_for('main.home'))
 
 
@@ -173,15 +163,18 @@ def gdisconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
+    # TODO: Investigate if the session variables should be deleted even on error
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['google_id']
         del login_session['username']
         del login_session['picture']
 
-        response = make_response(json.dumps('Successfully disconnected'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect(url_for('main.home'))
+        #
+        # response = make_response(json.dumps('Successfully disconnected'), 200)
+        # response.headers['Content-Type'] = 'application/json'
+        # return response
     else:
         response = make_response(json.dumps('Failed to revoke token for given user'),
                                  400)
@@ -243,7 +236,8 @@ def fbconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     # return output
-    return jsonify("Login via Facebook successful!")
+    # return jsonify("Login via Facebook successful!")
+    return redirect(url_for('main.home'))
 
 
 @auth.route('/fbdisconnect')
@@ -262,8 +256,7 @@ def fbdisconnect():
     del login_session['facebook_id']
     del login_session['picture']
     del login_session['access_token']
-
-    return render_template(url_for('main/home'))
+    return redirect(url_for('main.home'))
 
 def init_app(app):
     ''''''

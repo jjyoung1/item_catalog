@@ -43,7 +43,7 @@
     function signInCallback(authResult) {
         if (authResult['code']) {
 
-            // Hide the sign-in button now that the user is authorized, for example:
+            // Hide the sign-in button now that the user is authorized
             $('#signinButton').attr('style', 'display: none');
 
             // Send the code to the server
@@ -86,7 +86,7 @@
         scope="public_profile,email"
         {#        onlogin="checkLoginState();">#}
         onlogin="sendTokenToServer()">
-    <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+    <a href='javascript:sendTokenToServer()'></a>
 </fb:login-button>
 </p>
 
