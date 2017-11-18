@@ -15,13 +15,11 @@ from oauth2client import client
 from ..models import User
 from . import auth, basic_auth
 
-
 # login_manager = LoginManager()
 # login_manager.login_view = 'auth.showLogin'
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-
 
 
 @basic_auth.verify_password
@@ -144,7 +142,9 @@ def gconnect():
 
     user_id = User.getID(login_session['email'])
     if not user_id:
-        user_id = User.create(login_session)
+        user_id = User.create(username=login_session['username'],
+                              email=login_session['email']
+                              )
     login_session['user_id'] = user_id
 
     return redirect(url_for('main.home'))
@@ -257,6 +257,7 @@ def fbdisconnect():
     del login_session['picture']
     del login_session['access_token']
     return redirect(url_for('main.home'))
+
 
 def init_app(app):
     ''''''

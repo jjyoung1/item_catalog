@@ -6,8 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 import random, string
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
-from flask import g
-from passlib.apps import custom_app_context as pwd_context
+from flask import g, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -27,21 +27,28 @@ class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(32), nullable=False)
-    # password_hash = Column(String(64))
+    password_hash = Column(String(64))
     email = Column(String(64), nullable=False, unique=True)
     picture = Column(String(250))
 
-    # def hash_password(self, password):
-    #     self.password_hash = pwd_context.encrypt(password)
-    #
-    # def verify_password(self, password):
-    #     return pwd_context.verify(password, self.password_hash)
-    #
-    # Add a method to generate auth tokens here
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password=None):
+        # If no password is provided, set to a non-verifiable password hash
+        if not password:
+            self.password_hash = "#"
+        else:
+            self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
     def generate_auth_token(self):
         s = Serializer(secret_key, expires_in=6000)
         return s.dumps({'id': self.id})
-
 
     # Add a method to verify auth tokens here
     @staticmethod
@@ -63,23 +70,27 @@ class User(Base):
     # Returns user.id if created
     # Otherwise it returns the existing user.id
     @staticmethod
-    def create(login_session):
+    def create(username, email, password=None):
+
+        assert(username)
+        assert(email)
 
         # Abort if user already exists
-        user = g.db_session.query(User).filter_by(email=login_session['email']).first()
+        user = g.db_session.query(User).filter_by(email=email).first()
         if user:
             return user.id
 
         # Create new user
-        user = User(username=login_session['username'], email=login_session['email'],
-                    picture=login_session['picture'])
+        user = User(username=username, email=email,
+                    password=password)
+        user.picture = url_for('static',filename='image/generic_user.jpg')
 
         # Persist in database
         g.db_session.add(user)
         g.db_session.commit()
 
         # return id of created user
-        return User.getID(login_session['email'])
+        return User.getID(email)
 
     @staticmethod
     def getID(email):
@@ -106,23 +117,21 @@ class Category(Base):
             'name': self.name,
         }
 
-    # @staticmethod
-    # def create(category_name):
-    #     assert category_name
-    #     try:
-    #         category = Category(category_name)
-    #         g.db_session.add(category)
-    #         g.db_session.commit()
-    #         category = g.db_session.query.filter(name=category_name).one()
-    #         return category
-    #
-    #     except Exception as e:
-    #         print(type(e))
-    #         print(e.args)
-    #         print(e)
-    #         return None
-
-
+        # @staticmethod
+        # def create(category_name):
+        #     assert category_name
+        #     try:
+        #         category = Category(category_name)
+        #         g.db_session.add(category)
+        #         g.db_session.commit()
+        #         category = g.db_session.query.filter(name=category_name).one()
+        #         return category
+        #
+        #     except Exception as e:
+        #         print(type(e))
+        #         print(e.args)
+        #         print(e)
+        #         return None
 
 
 class Item(Base):
