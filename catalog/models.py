@@ -8,6 +8,7 @@ import random, string
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from flask import g, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -23,12 +24,12 @@ Base = declarative_base()
 DBSession = None
 
 
-class User(Base):
+class User(UserMixin, Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    username = Column(String(32), nullable=False)
-    password_hash = Column(String(64))
-    email = Column(String(64), nullable=False, unique=True)
+    username = Column(String(64), unique=True, nullable=False, index=True)
+    password_hash = Column(String(128))
+    email = Column(String(64), nullable=False, unique=True, index=True)
     picture = Column(String(250))
 
     @property
@@ -72,8 +73,8 @@ class User(Base):
     @staticmethod
     def create(username, email, password=None):
 
-        assert(username)
-        assert(email)
+        assert (username)
+        assert (email)
 
         # Abort if user already exists
         user = g.db_session.query(User).filter_by(email=email).first()
@@ -81,9 +82,11 @@ class User(Base):
             return user.id
 
         # Create new user
-        user = User(username=username, email=email,
-                    password=password)
-        user.picture = url_for('static',filename='image/generic_user.jpg')
+        user = User()
+        user.username = username
+        user.email = email
+        user.password = password
+        user.picture = url_for('static', filename='image/generic_user.jpg')
 
         # Persist in database
         g.db_session.add(user)
@@ -102,7 +105,10 @@ class User(Base):
 
     @staticmethod
     def getInfo(user_id):
-        return g.db_session(User).filter_by(id=user_id).one()
+        s = DBSession()
+        user = s.query(User).filter_by(id=user_id).one()
+        s.close()
+        return user
 
 
 class Category(Base):

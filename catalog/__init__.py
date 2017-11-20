@@ -8,6 +8,7 @@ import json
 bootstrap = Bootstrap()
 moment = Moment()
 login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -31,6 +32,7 @@ def create_app(config_name):
     from catalog.auth.views import init_app as auth_init_app
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     auth_init_app(app)
+    login_manager.init_app(app)
 
     return app
 

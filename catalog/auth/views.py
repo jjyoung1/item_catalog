@@ -14,9 +14,10 @@ from oauth2client import client
 
 from ..models import User
 from . import auth, basic_auth
+from .. import login_manager
 
 # login_manager = LoginManager()
-# login_manager.login_view = 'auth.showLogin'
+# login_manager.login_view = 'auth.login'
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
@@ -46,7 +47,7 @@ def get_auth_token():
 
 
 @auth.route('/login')
-def showLogin():
+def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
     return render_template("auth/login.html", STATE=state)
@@ -257,6 +258,10 @@ def fbdisconnect():
     del login_session['picture']
     del login_session['access_token']
     return redirect(url_for('main.home'))
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.getInfo(user_id)
 
 
 def init_app(app):
