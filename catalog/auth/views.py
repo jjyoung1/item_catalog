@@ -20,7 +20,7 @@ from .. import login_manager
 # login_manager.login_view = 'auth.login'
 
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open('secrets/client_secrets.json', 'r').read())['web']['client_id']
 
 
 @basic_auth.verify_password
@@ -81,7 +81,7 @@ def gconnect():
 
     # Set path to the Web application client_secret_*.json file you downloaded from the
     # Google API Console: https://console.developers.google.com/apis/credentials
-    CLIENT_SECRET_FILE = 'client_secrets.json'
+    CLIENT_SECRET_FILE = 'secrets/client_secrets.json'
 
     # Exchange auth code for access token, refresh token, and ID token
     credentials = client.credentials_from_clientsecrets_and_code(
@@ -192,8 +192,8 @@ def fbconnect():
     access_token = request.data.decode()
 
     # Exchange client token for long-lived server-side token
-    app_id = json.loads(open('/vagrant/fb_client_secrets.json', 'r').read())['web']['app_id']
-    app_secret = json.loads(open('/vagrant/fb_client_secrets.json', 'r').read())['web']['app_secret']
+    app_id = json.loads(open('secrets/fb_client_secrets.json', 'r').read())['web']['app_id']
+    app_secret = json.loads(open('secrets/fb_client_secrets.json', 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/v2.10/oauth/' \
           'access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s' \
           '&fb_exchange_token=%s' % (app_id, app_secret, access_token)

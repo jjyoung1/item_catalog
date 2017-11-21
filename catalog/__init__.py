@@ -11,7 +11,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open('secrets/client_secrets.json', 'r').read())['web']['client_id']
 
 
 def create_app(config_name):

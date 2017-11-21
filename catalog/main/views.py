@@ -19,7 +19,7 @@ from ..auth.views import basic_auth as auth
 #    object that can be sent to the client
 
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open('secrets/client_secrets.json', 'r').read())['web']['client_id']
 
 @main.route('/users', methods=['POST'])
 def new_user():
