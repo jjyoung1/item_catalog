@@ -70,30 +70,30 @@ class User(UserMixin, Base):
     # Checks to see if the User already exists.
     # Returns user.id if created
     # Otherwise it returns the existing user.id
-    @staticmethod
-    def create(username, email, password=None):
-
-        assert (username)
-        assert (email)
-
-        # Abort if user already exists
-        user = g.db_session.query(User).filter_by(email=email).first()
-        if user:
-            return user.id
-
-        # Create new user
-        user = User()
-        user.username = username
-        user.email = email
-        user.password = password
-        user.picture = url_for('static', filename='image/generic_user.jpg')
-
-        # Persist in database
-        g.db_session.add(user)
-        g.db_session.commit()
-
-        # return id of created user
-        return User.getID(email)
+    # @staticmethod
+    # def create(username, email, password=None):
+    #
+    #     assert (username)
+    #     assert (email)
+    #
+    #     # Abort if user already exists
+    #     user = g.db_session.query(User).filter_by(email=email).first()
+    #     if user:
+    #         return user.id
+    #
+    #     # Create new user
+    #     user = User()
+    #     user.username = username
+    #     user.email = email
+    #     user.password = password
+    #     user.picture = url_for('static', filename='image/generic_user.jpg')
+    #
+    #     # Persist in database
+    #     g.db_session.add(user)
+    #     g.db_session.commit()
+    #
+    #     # return id of created user
+    #     return User.getID(email)
 
     @staticmethod
     def getID(email):

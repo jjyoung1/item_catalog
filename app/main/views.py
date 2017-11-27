@@ -8,18 +8,19 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
-from catalog import models
-from catalog import has_no_empty_params
+from app import models
+from app import has_no_empty_params
 from . import main
 from .forms import CategoryForm, ItemForm
 from ..models import Category
 from ..auth.views import basic_auth as auth
+from secrets import google_client_secrets as gcs
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
 
-CLIENT_ID = json.loads(
-    open('secrets/client_secrets.json', 'r').read())['web']['client_id']
+CLIENT_ID = gcs.get_client_id()
+
 
 @main.route('/users', methods=['POST'])
 def new_user():
