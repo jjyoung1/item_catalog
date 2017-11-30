@@ -10,21 +10,25 @@ from flask import g, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+from . import db
+
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 
 '''
-Base needs to be globally defined so it can be used as a base class
-for the ORM models
-'''
-Base = declarative_base()
+# Base needs to be globally defined so it can be used as a base class
+# for the ORM models
+# '''
+
+
+# Base = declarative_base()
 
 # Session is the factory for SQLAlchemy sessions.  It's created in the
 # Model init_app() function
-DBSession = None
+# DBSession = None
 
 
-class User(UserMixin, Base):
+class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(64), unique=True, nullable=False, index=True)
@@ -51,6 +55,11 @@ class User(UserMixin, Base):
         s = Serializer(secret_key, expires_in=6000)
         return s.dumps({'id': self.id})
 
+    # Delete this user from database
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     # Add a method to verify auth tokens here
     @staticmethod
     def verify_auth_token(token):
@@ -67,58 +76,53 @@ class User(UserMixin, Base):
     # Helper functions for User
     #
     # Create a new User
-    # Checks to see if the User already exists.
-    # Returns user.id if created
-    # Otherwise it returns the existing user.id
-    # @staticmethod
-    # def create(username, email, password=None):
-    #
-    #     assert (username)
-    #     assert (email)
-    #
-    #     # Abort if user already exists
-    #     user = g.db_session.query(User).filter_by(email=email).first()
-    #     if user:
-    #         return user.id
-    #
-    #     # Create new user
-    #     user = User()
-    #     user.username = username
-    #     user.email = email
-    #     user.password = password
-    #     user.picture = url_for('static', filename='image/generic_user.jpg')
-    #
-    #     # Persist in database
-    #     g.db_session.add(user)
-    #     g.db_session.commit()
-    #
-    #     # return id of created user
-    #     return User.getID(email)
+    @staticmethod
+    def create(username, email, password=None, picture = None):
+
+        assert (username)
+        assert (email)
+
+        # Abort if user already exists
+        # user = db.session.query(User).filter_by(email=email).first()
+        # if user:
+        #     return user.id
+
+        # Create new user
+        user = User()
+        user.username = username
+        user.email = email
+        user.password = password
+        user.picture = picture
+
+        # Persist in database
+        db.session.add(user)
+        db.session.commit()
+
+        # return id of created user
+        return User.getID(email)
 
     @staticmethod
     def getID(email):
         try:
-            user = g.db_session.query(User).filter_by(email=email).one()
+            user = db.session.query(User).filter_by(email=email).one()
             return user.id
         except:
             return None
 
     @staticmethod
     def getInfo(user_id):
-        s = DBSession()
-        user = s.query(User).filter_by(id=user_id).one()
-        s.close()
+        user = db.session.query(User).filter_by(id=user_id).first()
         return user
 
 
-class Category(Base):
+class Category(db.Model):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
 
     @property
     def serialize(self):
-        """Return object data in easily serializeable format"""
+        """Return object data in easily serializable format"""
         return {
             'name': self.name,
         }
@@ -128,9 +132,9 @@ class Category(Base):
         #     assert category_name
         #     try:
         #         category = Category(category_name)
-        #         g.db_session.add(category)
-        #         g.db_session.commit()
-        #         category = g.db_session.query.filter(name=category_name).one()
+        #         db.session.add(category)
+        #         db.session.commit()
+        #         category = db.session.query.filter(name=category_name).one()
         #         return category
         #
         #     except Exception as e:
@@ -140,7 +144,7 @@ class Category(Base):
         #         return None
 
 
-class Item(Base):
+class Item(db.Model):
     ''''''
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True)
@@ -158,16 +162,15 @@ class Item(Base):
             'category': self.category_id,
         }
 
-
-def setup_db(app):
-    global DBSession
-    if DBSession is None:
-        engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-        Base.metadata.create_all(engine)
-
-        # Create factory for Scoped Sessions
-        DBSession = scoped_session(sessionmaker(bind=engine))
-
-
-def init_app(app):
-    setup_db(app)
+# def setup_db(app):
+#     global DBSession
+#     if DBSession is None:
+#         engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+#         Base.metadata.create_all(engine)
+#
+#         # Create factory for Scoped Sessions
+#         DBSession = scoped_session(sessionmaker(bind=engine))
+#
+#
+# def init_app(app):
+#     setup_db(app)

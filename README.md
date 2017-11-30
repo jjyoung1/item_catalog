@@ -2,6 +2,9 @@
 Catalog app to manage item categories and items.  Implements both Web
 and Restful interfaces
 
+## Startup
+Execute catalog.py to start program
+
 ## URL Summary
 * / - homepage of Catalog App
 * /auth/gdisconnect - Disconnect from Google OAuth login session
@@ -19,5 +22,14 @@ and Restful interfaces
 * /catalog/\<category\>/\<item\>/edit - Edit item
 * /catalog/\<category\>/\<item\>/delete - Delete item confirmation
 
+## Testing
+### Environment Variables to be set
+* FLASK_APP=catalog.py
+* FLASK_COVERAGE=1
+* FLASK_DEBUG=1
 
+### Execution of Tests
+Within the directory containing **catalog.py** execute:
+
+*flask test*
 

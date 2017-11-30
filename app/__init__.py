@@ -1,20 +1,21 @@
 import os
 from flask import Flask
 from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
 from flask_moment import Moment
 from flask_login import LoginManager
-from config import config
 import json
-from secrets import google_client_secrets as gcs
+
+from config import config
 
 
 bootstrap = Bootstrap()
 moment = Moment()
+db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-CLIENT_ID = gcs.get_client_id()
+# basedir = os.path.abspath(os.path.dirname(__file__))
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -23,9 +24,13 @@ def create_app(config_name):
 
     bootstrap.init_app(app)
     moment.init_app(app)
+    db.init_app(app)
 
-    from app.models import init_app as models_init_app
-    models_init_app(app)
+    with app.app_context():
+        db.create_all()
+
+    # from app.models import init_app as models_init_app
+    # models_init_app(app)
 
     from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
@@ -42,3 +47,5 @@ def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else()
     arguments = rule.arguments if rule.arguments is not None else()
     return len(defaults) >= len(arguments)
+
+

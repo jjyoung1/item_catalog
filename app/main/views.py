@@ -15,6 +15,7 @@ from .forms import CategoryForm, ItemForm
 from ..models import Category
 from ..auth.views import basic_auth as auth
 from secrets import google_client_secrets as gcs
+from .. import db
 
 # Converts return value from a function into a real response
 #    object that can be sent to the client
@@ -33,23 +34,23 @@ def new_user():
 
     models.User.create(username, password, email)
 
-    if g.db_session.query(models.User).filter_by(username=username).first() is not None:
+    if db.session.query(models.User).filter_by(username=username).first() is not None:
         print("existing user")
-        user = g.db_session.query(models.User).filter_by(username=username).first()
+        user = db.session.query(models.User).filter_by(username=username).first()
         return jsonify({
             'message': 'user already exists'}), 200  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
     user = models.User(username=username)
     user.hash_password(password)
-    g.db_session.add(user)
-    g.db_session.commit()
+    db.session.add(user)
+    db.session.commit()
     return jsonify(
         {'username': user.username}), 201  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
 # @main.route('/users/<int:id>')
 # def get_user(id):
-#     user = g.db_session.query(models.User).filter_by(id=id).one()
+#     user = db.session.query(models.User).filter_by(id=id).one()
 #     if not user:
 #         abort(400)
 #     return jsonify({'username': user.username})
@@ -65,15 +66,15 @@ def new_user():
 # @auth.login_required
 # def showAllProducts():
 #     if request.method == 'GET':
-#         products = g.db_session.query(models.Product).all()
+#         products = db.session.query(models.Product).all()
 #         return jsonify(products=[p.serialize for p in products])
 #     if request.method == 'POST':
 #         name = request.json.get('name')
 #         category = request.json.get('category')
 #         price = request.json.get('price')
 #         newItem = models.Product(name=name, category=category, price=price)
-#         g.db_session.add(newItem)
-#         g.db_session.commit()
+#         db.session.add(newItem)
+#         db.session.commit()
 #         return jsonify(newItem.serialize)
 #
 
@@ -107,8 +108,8 @@ def newcategory():
         try:
             category_name = form.category_name.data
             category = Category(name=category_name)
-            g.db_session.add(category)
-            g.db_session.commit()
+            db.session.add(category)
+            db.session.commit()
             flash("{} Category created".format(category_name))
             return redirect(url_for('main.home'))
         except IntegrityError as e:

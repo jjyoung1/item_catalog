@@ -17,6 +17,8 @@ from .. import login_manager
 from secrets import google_client_secrets as gcs, \
     facebook_client_secrets as fbcs
 
+from .. import db
+
 # login_manager = LoginManager()
 # login_manager.login_view = 'auth.login'
 
@@ -28,10 +30,10 @@ def verify_password(username_or_token, password):
     # Check if a valid token was passed
     user_id = User.verify_auth_token(username_or_token)
     if user_id:
-        user = g.db_session.query(User).filter_by(id=user_id).one()
+        user = db.session.query(User).filter_by(id=user_id).one()
     else:
         # Attempt to get user from DB
-        user = g.db_session.query(User).filter_by(username=username_or_token).first()
+        user = db.session.query(User).filter_by(username=username_or_token).first()
         if not user or not user.verify_password(password):
             return False  # Return invalid user
     g.user = user
@@ -148,8 +150,8 @@ def gconnect():
         user.password = ''
         user.email = login_session['email']
         user.picture = None
-        g.db_session.add(user)
-        g.db_session.commit()
+        db.session.add(user)
+        db.session.commit()
         user_id = User.getID(login_session['email'])
 
     login_session['user_id'] = user_id
@@ -233,8 +235,8 @@ def fbconnect():
         user.password = ''
         user.email = login_session['email']
         user.picture = None
-        g.db_session.add(user)
-        g.db_session.commit()
+        db.session.add(user)
+        db.session.commit()
         user_id = User.getID(login_session['email'])
 
     # # TODO: change this to a reasonable redirection

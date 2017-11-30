@@ -4,6 +4,9 @@ import random, string
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
+    # To Be Deprecated
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
     SECRET_KEY = os.environ.get('SECRET_KEY') or \
                  ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True

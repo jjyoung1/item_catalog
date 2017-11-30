@@ -1,5 +1,5 @@
 '''
-File used to enable flare run in PyCharm
+File used to enable flask run in PyCharm
 '''
 from flask.cli import main
 
