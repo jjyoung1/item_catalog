@@ -1,19 +1,19 @@
-import json  # Lib: Convert in-memory python objects to a serialized representation in json
+# import json  # Lib: Convert in-memory python objects to a serialized representation in json
 
 from flask import url_for, jsonify, request, abort, g, render_template, flash
 from flask import current_app, redirect
 
-from flask_httpauth import HTTPBasicAuth
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+# from flask_httpauth import HTTPBasicAuth
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
 from app import models
-from app import has_no_empty_params
+# from app import has_no_empty_params
 from . import main
 from .forms import CategoryForm, ItemForm
 from ..models import Category
-from ..auth.views import basic_auth as auth
+from flask_login import login_required
 from secrets import google_client_secrets as gcs
 from .. import db
 
@@ -100,7 +100,7 @@ def newitem():
 
 
 @main.route('/newcategory', methods=['GET', 'POST'])
-@auth.login_required
+@login_required
 def newcategory():
     form = CategoryForm()
     category_name = None

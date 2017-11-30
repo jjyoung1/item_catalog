@@ -15,9 +15,10 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right col-sm-3 col-xs-12">
-                        {% if session.username %}
+{#                        {% if session.username %}#}
+                          {% if current_user.is_authenticated %}
                             <p>
-                                Signed in: {{ session.username }}
+                                Signed in: {{ current_user.username }}
                                 <img class="image-tn" src="{{ session.picture }}">
                             </p>
                             <a href="{{ url_for('auth.logout') }}">Sign Out</a>

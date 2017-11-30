@@ -1,6 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{%  extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block head %}
+    {{ super() }}
 
     <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
@@ -24,8 +25,9 @@
     </script>
     <meta charset="UTF-8">
     <title>Login</title>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
 <!-- Use an image that follows the branding guidelines in a real app -->
 <button id="signinButton">Sign in with Google</button>
 <script>
@@ -89,6 +91,10 @@
     <a href='javascript:sendTokenToServer()'></a>
 </fb:login-button>
 </p>
+<div>
+    {{ wtf.quick_form(form) }}
+</div>
+
 
 <script>
     window.fbAsyncInit = function () {
@@ -157,5 +163,5 @@ function sendTokenToServer() {
     });
 }
 </script>
-</body>
+{% endblock %}
 </html>

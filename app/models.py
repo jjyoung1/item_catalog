@@ -10,6 +10,7 @@ from flask import g, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+from . import login_manager
 from . import db
 
 # You will use this secret key to create and verify your tokens
@@ -21,20 +22,13 @@ secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x
 # '''
 
 
-# Base = declarative_base()
-
-# Session is the factory for SQLAlchemy sessions.  It's created in the
-# Model init_app() function
-# DBSession = None
-
-
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(64), unique=True, nullable=False, index=True)
-    password_hash = Column(String(128))
-    email = Column(String(64), nullable=False, unique=True, index=True)
-    picture = Column(String(250))
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(128))
+    email = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    picture = db.Column(db.String(250))
 
     @property
     def password(self):
@@ -60,6 +54,21 @@ class User(UserMixin, db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    @property
+    def serialize(self):
+        """Return object data in easily serializable format"""
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'picture': self.picture,
+        }
+
+    # Flask-Login user loader
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
     # Add a method to verify auth tokens here
     @staticmethod
     def verify_auth_token(token):
@@ -77,15 +86,10 @@ class User(UserMixin, db.Model):
     #
     # Create a new User
     @staticmethod
-    def create(username, email, password=None, picture = None):
+    def create(username, email, password=None, picture=None):
 
         assert (username)
         assert (email)
-
-        # Abort if user already exists
-        # user = db.session.query(User).filter_by(email=email).first()
-        # if user:
-        #     return user.id
 
         # Create new user
         user = User()
@@ -161,16 +165,3 @@ class Item(db.Model):
             'id': self.id,
             'category': self.category_id,
         }
-
-# def setup_db(app):
-#     global DBSession
-#     if DBSession is None:
-#         engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-#         Base.metadata.create_all(engine)
-#
-#         # Create factory for Scoped Sessions
-#         DBSession = scoped_session(sessionmaker(bind=engine))
-#
-#
-# def init_app(app):
-#     setup_db(app)

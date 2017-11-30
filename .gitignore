@@ -168,3 +168,6 @@ venv.bak/
 .vagrant
 
 item-catalog-dev.sqlite
+item-app-dev.sqlite
+item-app-test.sqlite
+tmp/

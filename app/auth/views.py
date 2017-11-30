@@ -8,7 +8,7 @@ from flask import render_template, request, make_response, abort, flash, \
     redirect, url_for, g
 from flask import session as login_session, jsonify
 from flask_httpauth import HTTPBasicAuth
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user
 from oauth2client import client
 
 from ..models import User
@@ -18,9 +18,7 @@ from secrets import google_client_secrets as gcs, \
     facebook_client_secrets as fbcs
 
 from .. import db
-
-# login_manager = LoginManager()
-# login_manager.login_view = 'auth.login'
+from .forms import LoginForm
 
 CLIENT_ID = gcs.get_client_id()
 
@@ -48,11 +46,21 @@ def get_auth_token():
     return jsonify({'token': token.decode('ascii')})
 
 
-@auth.route('/login')
+@auth.route('/login', methods=['GET','POST'])
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
-    return render_template("auth/login.html", STATE=state)
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user)
+            next = request.args.get('next')
+            if next is None or not next.startswith('/'):
+                next = url_for('main.home')
+            return redirect(next)
+        flash('Invalid username or password')
+    return render_template('auth/login.html', form=form, State=state)
 
 
 # TODO: Improve on logout response to user

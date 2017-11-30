@@ -25,6 +25,7 @@ def create_app(config_name):
     bootstrap.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    login_manager.init_app(app)
 
     with app.app_context():
         db.create_all()
@@ -43,9 +44,9 @@ def create_app(config_name):
 
     return app
 
-def has_no_empty_params(rule):
-    defaults = rule.defaults if rule.defaults is not None else()
-    arguments = rule.arguments if rule.arguments is not None else()
-    return len(defaults) >= len(arguments)
+# def has_no_empty_params(rule):
+#     defaults = rule.defaults if rule.defaults is not None else()
+#     arguments = rule.arguments if rule.arguments is not None else()
+#     return len(defaults) >= len(arguments)
 
 
