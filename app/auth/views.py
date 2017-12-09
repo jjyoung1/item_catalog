@@ -18,7 +18,7 @@ from secrets import google_client_secrets as gcs, \
     facebook_client_secrets as fbcs
 
 from .. import db
-from .forms import LoginForm
+from .forms import LoginForm, RegistrationForm
 
 CLIENT_ID = gcs.get_client_id()
 
@@ -46,6 +46,21 @@ def get_auth_token():
     return jsonify({'token': token.decode('ascii')})
 
 
+@auth.route('/register', methods=['GET','POST'])
+def register():
+    # state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    # login_session['state'] = state
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data,
+                    username=form.username.data,
+                    password=form.password.data,
+                    picture=url_for('static', filename='img/generic_user.jpg', _external=True))
+        db.session.add(user)
+        flash('Account Created')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html', form=form) #, State=state)
+
 @auth.route('/login', methods=['GET','POST'])
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -55,6 +70,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
+            login_session['picture'] = user.picture
             next = request.args.get('next')
             if next is None or not next.startswith('/'):
                 next = url_for('main.home')
