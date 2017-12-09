@@ -8,7 +8,7 @@ from flask import render_template, request, make_response, abort, flash, \
     redirect, url_for, g
 from flask import session as login_session, jsonify
 from flask_httpauth import HTTPBasicAuth
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from oauth2client import client
 
 from ..models import User
@@ -82,14 +82,17 @@ def login():
 # TODO: Improve on logout response to user
 @auth.route('/logout', methods=['GET', 'POST'])
 def logout():
-    if not login_session.get('username'):
+    # if not login_session.get('username'):
+    if not current_user.is_authenticated:
         flash("You are not logged in")
         return redirect(url_for('main.home'))
     else:
-        if login_session.get('google_id'):
-            return redirect(url_for('auth.gdisconnect'))
-        else:
-            return redirect(url_for('auth.fbdisconnect'))
+        logout_user()
+        return redirect(url_for('main.home'))
+        # if login_session.get('google_id'):
+        #     return redirect(url_for('auth.gdisconnect'))
+        # else:
+        #     return redirect(url_for('auth.fbdisconnect'))
 
 
 @auth.route('/gconnect', methods=['POST'])
