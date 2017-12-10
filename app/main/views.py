@@ -80,7 +80,8 @@ def new_user():
 
 @main.route('/', methods=['GET'])
 def home():
-    return render_template("home.html")
+    categories = db.session.query(Category)
+    return render_template("home.html", categories=categories)
 
 
 @main.route('/newitem', methods=['GET', 'POST'])

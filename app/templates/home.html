@@ -1,7 +1,21 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <div class="col-sm-12">
-        <p>Hello from home!</p>
+    <div class="col-sm-3 col-xs-12">
+        <h2>Categories</h2>
+        <a href="{{ url_for('main.newcategory') }}">Add a new category</a>
+        {% if not categories %}
+            <p>No Categories</p>
+        {% else %}
+            <ul>
+
+                {% for c in categories %}
+                    <li>{{ c.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="col-sm-9 cols-xs-12">
     </div>
 {% endblock %}
