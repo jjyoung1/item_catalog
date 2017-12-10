@@ -7,30 +7,39 @@
 
 {% block title %}Catalog{% endblock %}
 
-{% block navbar %}
-    <div class="navbar-header">
-        <div class="navbar navbar-default" role="navigation">
-            <div class="container">
-                <div class="navbar-header col-sm 9 col-xs-12">
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav navbar-right col-sm-3 col-xs-12">
-{#                        {% if session.username %}#}
-                          {% if current_user.is_authenticated %}
-                            <p>
-                                Signed in: {{ current_user.username }}
-                                <img class="image-tn" src="{{ session.picture }}">
-                            </p>
-                            <a href="{{ url_for('auth.logout') }}">Sign Out</a>
-                        {% else %}
-                            <a href="{{ url_for('auth.login') }}">Log In</a>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </div>
+{% block body %}
+    <div class="col-sm-9 col-xs-12">
+        <h1>Catalog</h1>
     </div>
+    <div class="col-sm-3 col-xs-12">
+        {#                        {% if session.username %}#}
+        {% if current_user.is_authenticated %}
+            <p>
+                Signed in: {{ current_user.username }}
+                <img class="image-tn" src="{{ session.picture }}">
+            </p>
+            <a href="{{ url_for('auth.logout') }}">Sign Out</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Log In</a>
+        {% endif %}
+    </div>
+    {{ super() }}
 {% endblock %}
+
+{#{% block navbar %}#}
+{#    <div class="navbar-header">#}
+{#        <div class="navbar navbar-default" role="navigation">#}
+{#            <div class="container">#}
+{#                <div class="navbar-header">#}
+{#                </div>#}
+{#                <div class="navbar-collapse collapse ">#}
+{#                    <ul class="nav navbar-nav navbar-right ">#}
+{#                    </ul>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock %}#}
 
 {% block content %}
     {% with messages = get_flashed_messages() %}

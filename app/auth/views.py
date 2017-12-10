@@ -76,7 +76,7 @@ def login():
                 next = url_for('main.home')
             return redirect(next)
         flash('Invalid username or password')
-    return render_template('auth/login.html', form=form, State=state)
+    return render_template('auth/login.html', form=form, state=state)
 
 
 # TODO: Improve on logout response to user
@@ -166,23 +166,24 @@ def gconnect():
 
     # Get profile info from ID token
     login_session['google_id'] = credentials.id_token['sub']
-    login_session['email'] = credentials.id_token['email']
-    login_session['username'] = data['name']
+    email = credentials.id_token['email']
     login_session['picture'] = data['picture']
 
-    user_id = User.getID(login_session['email'])
+    user_id = User.getID(email)
     if not user_id:
         user = User()
-        user.username = login_session['username']
+        user.username = data['name']
         user.password = ''
         user.email = login_session['email']
         user.picture = None
         db.session.add(user)
         db.session.commit()
-        user_id = User.getID(login_session['email'])
+        user_id = User.getID(email)
 
-    login_session['user_id'] = user_id
-
+    user = User.getInfo(user_id)
+    login_user(user)
+    # login_session['user_id'] = user_id
+    # login_session['picture'] = user.picture
     return redirect(url_for('main.home'))
 
 
@@ -203,7 +204,7 @@ def gdisconnect():
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['google_id']
-        del login_session['username']
+        # del login_session['username']
         del login_session['picture']
 
         return redirect(url_for('main.home'))
@@ -248,37 +249,27 @@ def fbconnect():
     print("API JSON reuslt: %s" % result)
     data = json.loads(result.decode())
     login_session['provider'] = 'facebook'
-    login_session['username'] = data['name']
-    login_session['email'] = data['email']
+    # login_session['username'] = data['name']
+    # login_session['email'] = data['email']
     login_session['facebook_id'] = data['id']
     login_session['picture'] = data['picture']['data']['url']
     login_session['access_token'] = access_token
 
     # see if user exists, if it doesn't make a new one
-    user_id = User.getID(login_session['email'])
+    user_id = User.getID(data['email'])
     if not user_id:
         user = User()
         user.username = login_session['username']
         user.password = ''
-        user.email = login_session['email']
+        user.email = data['email']
         user.picture = None
         db.session.add(user)
         db.session.commit()
-        user_id = User.getID(login_session['email'])
+        user_id = User.getID(data['email'])
 
-    # # TODO: change this to a reasonable redirection
-    # output = ''
-    # output += '<h1>Welcome, '
-    # output += login_session['username']
-    # output += '!</h1>'
-    # output += '<img src="'
-    # output += login_session['picture']
-    # output += ' " style = "width: 300px; height: 300px;border-radius: ' \
-    #           '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print("done!")
-    # return output
-    # return jsonify("Login via Facebook successful!")
+    user = User.getInfo(user_id)
+    login_user(user)
+    flash("you are now logged in as %s" % user.username)
     return redirect(url_for('main.home'))
 
 

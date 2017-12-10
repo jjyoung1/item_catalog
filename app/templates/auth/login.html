@@ -51,7 +51,7 @@
             // Send the code to the server
             $.ajax({
                 type: 'POST',
-                url: '/auth/gconnect?state={{ STATE }}',
+                url: '/auth/gconnect?state={{ state }}',
                 // Always include an `X-Requested-With` header in every AJAX request,
                 // to protect against CSRF attacks.
                 headers: {
@@ -142,7 +142,7 @@ function sendTokenToServer() {
         console.log('(FB.api)Successful login for: ' + response.name);
         $.ajax({
             type: 'POST',
-            url: '/auth/fbconnect?state={{ STATE }}',
+            url: '/auth/fbconnect?state={{ state }}',
             processData: false,
             data: access_token,
             contentType: 'application/octet-stream; charset=utf-8',
