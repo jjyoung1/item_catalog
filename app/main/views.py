@@ -79,9 +79,15 @@ def new_user():
 #
 
 @main.route('/', methods=['GET'])
-def home():
+@main.route('/cathome/<category_id>', methods=['GET'])
+def home(category_id=None):
     categories = db.session.query(Category).order_by('name')
-    items = db.session.query(Item).order_by('name')
+    if not category_id:
+        items = db.session.query(Item).order_by('data_added').limit(10).all()
+    else:
+        # category_id = db.session.query(Category).filter_by(id=cat_id).one()
+        items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
+
     return render_template("home.html", categories=categories, items=items)
 
 

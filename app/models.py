@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relationship, sessionmaker
@@ -155,6 +155,7 @@ class Item(db.Model):
     name = Column(String)
     description = Column(String(512))
     category_id = Column(Integer, ForeignKey('category.id'))
+    data_added = Column(TIMESTAMP, server_default=func.now())
     category = relationship(Category)
 
     @property
