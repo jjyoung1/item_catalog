@@ -83,7 +83,7 @@ def new_user():
 def home(category_id=None):
     categories = db.session.query(Category).order_by('name')
     if not category_id:
-        items = db.session.query(Item).order_by('data_added').limit(10).all()
+        items = db.session.query(Item).order_by(Item.date_added.desc()).limit(10).all()
     else:
         # category_id = db.session.query(Category).filter_by(id=cat_id).one()
         items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')

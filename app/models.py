@@ -155,7 +155,7 @@ class Item(db.Model):
     name = Column(String)
     description = Column(String(512))
     category_id = Column(Integer, ForeignKey('category.id'))
-    data_added = Column(TIMESTAMP, server_default=func.now())
+    date_added = Column(TIMESTAMP, server_default=func.now())
     category = relationship(Category)
 
     @property
