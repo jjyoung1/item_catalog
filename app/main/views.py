@@ -12,7 +12,7 @@ from app import models
 # from app import has_no_empty_params
 from . import main
 from .forms import CategoryForm, ItemForm
-from ..models import Category
+from ..models import Category, Item
 from flask_login import login_required
 from secrets import google_client_secrets as gcs
 from .. import db
@@ -80,8 +80,9 @@ def new_user():
 
 @main.route('/', methods=['GET'])
 def home():
-    categories = db.session.query(Category)
-    return render_template("home.html", categories=categories)
+    categories = db.session.query(Category).order_by('name')
+    items = db.session.query(Item).order_by('name')
+    return render_template("home.html", categories=categories, items=items)
 
 
 @main.route('/newitem', methods=['GET', 'POST'])
@@ -94,8 +95,14 @@ def newitem():
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
-        category = form.category.data
+        category_id = 1 # form.category.data
+        item = Item(name = name,
+                    description = description,
+                    category_id = category_id)
+        db.session.add(item)
+        db.session.commit()
         flash("Item {} created".format(name))
+
         return redirect(url_for('main.home'))
     return render_template('item_form.html', form=form, name=name, description=description, category=category)
 

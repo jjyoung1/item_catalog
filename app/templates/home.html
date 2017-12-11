@@ -17,5 +17,17 @@
     </div>
 
     <div class="col-sm-9 cols-xs-12">
+    <h2>Items</h2>
+    <a href="{{ url_for('main.newitem') }}">Add a new item</a>
+        {% if not items %}
+            <p>No Items</p>
+        {% else %}
+            <ul>
+
+                {% for i in items %}
+                    <li>{{ i.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
 {% endblock %}
