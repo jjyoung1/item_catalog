@@ -1,6 +1,7 @@
 import unittest
 from app import create_app, db
 from app.models import User
+from flask import jsonify
 
 
 class UserModelTestCase(unittest.TestCase):
@@ -36,9 +37,9 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_user_create(self):
         u_id = User.create(email="john.doe@user.com",
-                        username="John Doe",
-                        password="foo")
-        self.assertIsNotNone(u_id,'User creation failed')
+                           username="John Doe",
+                           password="foo")
+        self.assertIsNotNone(u_id, 'User creation failed')
 
         # Get User info
         user = User.getInfo(u_id)
@@ -53,7 +54,7 @@ class UserModelTestCase(unittest.TestCase):
         # Get User info
         user = User.getInfo(u_id)
         self.assertIsNotNone(user, 'User.getInfo() failed to return User')
-        self.assertEqual(user.password_hash,'#', 'Password hash not set to #')
+        self.assertEqual(user.password_hash, '#', 'Password hash not set to #')
         # user.delete()
 
     def test_user_create_delete(self):
@@ -61,3 +62,24 @@ class UserModelTestCase(unittest.TestCase):
                            username="John Doe")
         user = User.getInfo(u_id)
         user.delete()
+
+    def test_serialize(self):
+        email = "john.doe@user.com"
+        username = "John Doe"
+        password = "foo"
+        photo = "photo"
+        u_id = User.create(email=email,
+                           username=username,
+                           password=password,
+                           picture=photo)
+        self.assertIsNotNone(u_id, 'User creation failed')
+
+        # Get User info
+        user = User.getInfo(u_id)
+        self.assertIsNotNone(user, 'User.getInfo failed to return User')
+        s_user = user.serialize()
+        self.assertEqual(s_user['username'], username)
+        self.assertEqual(s_user['email'],email)
+        self.assertEqual(s_user['picture'], photo)
+        self.assertEqual(s_user['id'], u_id)
+        self.assertEqual(s_user['picture'], 'photo')

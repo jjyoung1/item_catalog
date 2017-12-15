@@ -54,15 +54,16 @@ class User(UserMixin, db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    @property
     def serialize(self):
         """Return object data in easily serializable format"""
-        return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'picture': self.picture,
-        }
+        s_user = {'id': self.id,
+                  'username': self.username,
+                  'email': self.email,
+                  'picture': self.picture,
+                  }
+        i = 1+1
+
+        return s_user
 
     # Flask-Login user loader
     @login_manager.user_loader

@@ -44,17 +44,18 @@ def new_user():
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
+
     return jsonify(
         {'username': user.username}), 201  # , {'Location': url_for('get_user', id = user.id, _external = True)}
 
 
-# @main.route('/users/<int:id>')
-# def get_user(id):
-#     user = db.session.query(models.User).filter_by(id=id).one()
-#     if not user:
-#         abort(400)
-#     return jsonify({'username': user.username})
-#
+@main.route('/users/<int:id>')
+def get_user(id):
+    user = db.session.query(models.User).filter_by(id=id).one()
+    if not user:
+        abort(400)
+    return jsonify(user.serialize)
+
 
 # @main.route('/resource')
 # @basic_auth.login_required
