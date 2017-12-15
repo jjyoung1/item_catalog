@@ -28,51 +28,35 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     apt-get -qqy install make zip unzip postgresql
 
     apt-get -qqy install python3 python3-pip
+
+    pip3 install virtualenv
     pip3 install --upgrade pip
-    pip3 install flask packaging oauthlib flask-oauthlib
-    pip3 install flask-httpauth
-    pip3 install flask-login
-    pip3 install flask-bootstrap, flask-moment, flask-mail
-    pip3 install redis
-    pip3 install passlib flask-httpauth
-    pip3 install sqlalchemy flask-sqlalchemy psycopg2 bleach
-    pip3 install flask-wtf
-    pip3 install httplib2
-    pip3 install oauth2client
-    pip3 install validate_email
-    pip3 install coverage
-    pip3 install flask-script
+    pip3 install virtualenv
 
-    apt-get -qqy install python python-pip
-    pip2 install --upgrade pip
-    pip2 install flask packaging oauthlib flask-oauthlib
-    pip2 install flask-httpauth
-    pip2 install flask-login
-    pip2 install flask-bootstrap, flask-moment, flask-mail
-    pip2 install redis
-    pip2 install passlib flask-httpauth
-    pip2 install sqlalchemy flask-sqlalchemy psycopg2 bleach
-    pip2 install flask-wtf
-    pip2 install httplib2
-    pip2 install oauth2client
-    pip2 install validate_email
-    pip2 install coverage
-    pip2 install flask-script
+    virtualenv /vagrant/venv -p /usr/bin/python3.5 --always-copy
+    source /vagrant/venv/bin/activate
 
-    # su postgres -c 'createuser -dRS vagrant'
-    # su vagrant -c 'createdb'
-    # su vagrant -c 'createdb news'
-    #su vagrant -c 'createdb forum'
-    # su vagrant -c 'psql forum -f /vagrant/forum/forum.sql'
+    # Should now be running in virtual environment
+    pip install flask
+    pip install --upgrade pip
+    pip install flask packaging oauthlib flask-oauthlib
+    pip install oauth2client flask-httpauth flask-login passlib
+    pip install flask-bootstrap flask-moment flask-mail flask-wtf
+    pip install sqlalchemy flask-sqlalchemy bleach
+    pip install httplib2
+    pip install validate_email
+    pip install coverage
+    #pip install redis
+    pip install psycopg2
 
     vagrantTip="[35m[1mThe shared directory is located at /vagrant\\nTo access your shared files: cd /vagrant[m"
     echo -e $vagrantTip > /etc/motd
 
-    wget http://download.redis.io/redis-stable.tar.gz
-    tar xvzf redis-stable.tar.gz
-    cd redis-stable
-    make
-    make install
+    #wget http://download.redis.io/redis-stable.tar.gz
+    #tar xvzf redis-stable.tar.gz
+    #cd redis-stable
+    #make
+    #make install
 
     echo "Done installing your virtual machine!"
   SHELL
