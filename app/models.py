@@ -61,8 +61,6 @@ class User(UserMixin, db.Model):
                   'email': self.email,
                   'picture': self.picture,
                   }
-        i = 1+1
-
         return s_user
 
     # Flask-Login user loader
