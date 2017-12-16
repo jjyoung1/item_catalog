@@ -5,9 +5,9 @@ import random, string
 from .. import db
 from .. import login_manager
 
-
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
@@ -32,8 +32,8 @@ class User(UserMixin, db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def generate_auth_token(self):
-        s = Serializer(secret_key, expires_in=6000)
+    def generate_auth_token(self, expires_in=6000):
+        s = Serializer(secret_key, expires_in=expires_in)
         return s.dumps({'id': self.id})
 
     # Delete this user from database
@@ -61,19 +61,20 @@ class User(UserMixin, db.Model):
         s = Serializer(secret_key)
         try:
             data = s.loads(token)
-        except BadSignature:
-            return None
         except SignatureExpired:
             return None
+        except BadSignature:
+            return None
+
         user_id = data['id']
         return user_id
+
 
     # Helper functions for User
     #
     # Create a new User
     @staticmethod
     def create(username, email, password=None, picture=None):
-
         assert (username)
         assert (email)
 
@@ -91,6 +92,7 @@ class User(UserMixin, db.Model):
         # return id of created user
         return User.getID(email)
 
+
     @staticmethod
     def getID(email):
         try:
@@ -99,9 +101,8 @@ class User(UserMixin, db.Model):
         except:
             return None
 
+
     @staticmethod
     def getInfo(user_id):
         user = db.session.query(User).filter_by(id=user_id).first()
         return user
-
-

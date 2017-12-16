@@ -16,25 +16,6 @@ class UserModelTestCase(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def test_password_setter(self):
-        u = User(password='foo')
-        self.assertTrue(u.password_hash is not None)
-
-    def test_no_password_getter(self):
-        u = User(password='foo')
-        with self.assertRaises(AttributeError):
-            u.password
-
-    def test_password_verification(self):
-        u = User(password='foo')
-        self.assertTrue(u.verify_password('foo'))
-        self.assertFalse(u.verify_password('bar'))
-
-    def test_password_salts_are_random(self):
-        u = User(password='foo')
-        u2 = User(password='foo')
-        self.assertTrue(u.password_hash != u2.password_hash)
-
     def test_user_create(self):
         u_id = User.create(email="john.doe@user.com",
                            username="John Doe",
@@ -46,40 +27,8 @@ class UserModelTestCase(unittest.TestCase):
         self.assertIsNotNone(user, 'User.getInfo failed to return User')
         # user.delete()
 
-    def test_user_create_no_password(self):
-        u_id = User.create(email="john.doe@user.com",
-                           username="John Doe")
-        self.assertIsNotNone(u_id, 'User creation failed')
-
-        # Get User info
-        user = User.getInfo(u_id)
-        self.assertIsNotNone(user, 'User.getInfo() failed to return User')
-        self.assertEqual(user.password_hash, '#', 'Password hash not set to #')
-        # user.delete()
-
     def test_user_create_delete(self):
         u_id = User.create(email="john.doe@user.com",
                            username="John Doe")
         user = User.getInfo(u_id)
         user.delete()
-
-    def test_serialize(self):
-        email = "john.doe@user.com"
-        username = "John Doe"
-        password = "foo"
-        photo = "photo"
-        u_id = User.create(email=email,
-                           username=username,
-                           password=password,
-                           picture=photo)
-        self.assertIsNotNone(u_id, 'User creation failed')
-
-        # Get User info
-        user = User.getInfo(u_id)
-        self.assertIsNotNone(user, 'User.getInfo failed to return User')
-        s_user = user.serialize()
-        self.assertEqual(s_user['username'], username)
-        self.assertEqual(s_user['email'],email)
-        self.assertEqual(s_user['picture'], photo)
-        self.assertEqual(s_user['id'], u_id)
-        self.assertEqual(s_user['picture'], 'photo')
