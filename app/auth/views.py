@@ -11,7 +11,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager, login_user, logout_user, current_user
 from oauth2client import client
 
-from ..models import User
+from ..models.user import User
 from . import auth, basic_auth
 from .. import login_manager
 from secrets import google_client_secrets as gcs, \
