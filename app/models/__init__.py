@@ -10,8 +10,8 @@ from flask import g, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
-from . import login_manager
-from . import db
+from .. import login_manager
+from .. import db
 
 # You will use this secret key to create and verify your tokens
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
