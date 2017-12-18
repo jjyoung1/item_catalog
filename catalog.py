@@ -14,7 +14,8 @@ if os.environ.get('FLASK_COVERAGE'):
 from app import create_app, db
 from flask import g
 
-from app.models import Category, Item
+from app.models.category import Category
+from app.models.item import Item
 from app.models.user import User
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')

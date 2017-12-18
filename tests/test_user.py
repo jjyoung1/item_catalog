@@ -9,6 +9,9 @@ class TestUser(TestCase):
     password = 'mypass'
     picture = 'photo_url'
 
+    def setUp(self):
+        print("Hello")
+
     def test_password(self):
         user = TestUser.createUser()
         self.assertTrue(user.password_hash is not None)
