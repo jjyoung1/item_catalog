@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, \
+    ForeignKey, TIMESTAMP, func, exc
 
 from .. import db
+from sqlalchemy.exc import IntegrityError
 
 
 class Category(db.Model):
@@ -15,18 +17,15 @@ class Category(db.Model):
             'name': self.name,
         }
 
-        # @staticmethod
-        # def create(category_name):
-        #     assert category_name
-        #     try:
-        #         category = Category(category_name)
-        #         db.session.add(category)
-        #         db.session.commit()
-        #         category = db.session.query.filter(name=category_name).one()
-        #         return category
-        #
-        #     except Exception as e:
-        #         print(type(e))
-        #         print(e.args)
-        #         print(e)
-        #         return None
+    @staticmethod
+    def create(category_name):
+        try:
+            assert category_name
+            category = Category(name=category_name)
+            db.session.add(category)
+            db.session.commit()
+            category = db.session.query(Category).filter_by(name=category_name).one()
+            return category
+        except IntegrityError as e:
+            db.session.rollback()
+            raise

@@ -27,3 +27,10 @@ class Item(db.Model):
             'id': self.id,
             'category': self.category_id,
         }
+
+    # Create a new item in the specified category
+    @classmethod
+    def create(name, description, category_id):
+        return 0
+
+

@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app import models
 # from app import has_no_empty_params
 from . import main
+from .. import has_no_empty_params
 from .forms import CategoryForm, ItemForm
 from ..models.category import Category
 from ..models.item import Item
@@ -100,10 +101,10 @@ def newitem():
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
-        category_id = 1 # form.category.data
-        item = Item(name = name,
-                    description = description,
-                    category_id = category_id)
+        category_id = 1  # form.category.data
+        item = Item(name=name,
+                    description=description,
+                    category_id=category_id)
         db.session.add(item)
         db.session.commit()
         flash("Item {} created".format(name))
@@ -120,16 +121,12 @@ def newcategory():
     if form.validate_on_submit():
         try:
             category_name = form.category_name.data
-            category = Category(name=category_name)
-            db.session.add(category)
-            db.session.commit()
+            Category.create(category_name)
             flash("{} Category created".format(category_name))
             return redirect(url_for('main.home'))
         except IntegrityError as e:
-            print(type(e))
-            print(e.args)
-            print(e)
             flash("Error: Duplicate category: {} already exists".format(category_name))
+            return render_template('item_form.html', form=form, name=category_name)
     return render_template('item_form.html', form=form, name=category_name)
 
 
@@ -137,7 +134,6 @@ def newcategory():
 def site_map():
     links = []
     for rule in current_app.url_map.iter_rules():
-
         if "GET" in rule.methods and has_no_empty_params(rule):
             url = url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
