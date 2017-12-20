@@ -46,7 +46,7 @@ def get_auth_token():
     return jsonify({'token': token.decode('ascii')})
 
 
-@auth.route('/register', methods=['GET','POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     # state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     # login_session['state'] = state
@@ -59,9 +59,10 @@ def register():
         db.session.add(user)
         flash('Account Created')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', form=form) #, State=state)
+    return render_template('auth/register.html', form=form)  # , State=state)
 
-@auth.route('/login', methods=['GET','POST'])
+
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
