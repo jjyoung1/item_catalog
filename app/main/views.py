@@ -36,6 +36,7 @@ def home(category_id=None):
 
 
 @main.route('/newitem', methods=['GET', 'POST'])
+@login_required
 def newitem():
     name = None
     description = None
