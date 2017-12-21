@@ -9,5 +9,5 @@ class CategoryForm(FlaskForm):
 class ItemForm(FlaskForm):
     name = StringField("Item Name", validators=[DataRequired()])
     description = TextAreaField("Description")
-    category = SelectField("Category Name")
+    category = SelectField("Category Name", coerce=int)
     submit = SubmitField('Submit')

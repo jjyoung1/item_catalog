@@ -29,3 +29,8 @@ class Category(db.Model):
         except IntegrityError as e:
             db.session.rollback()
             raise
+
+    @staticmethod
+    def getAll():
+        categories = db.session.query(Category)
+        return categories
