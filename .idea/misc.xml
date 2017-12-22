@@ -3,5 +3,5 @@
   <component name="PreferredVcsStorage">
     <preferredVcsName>ApexVCS</preferredVcsName>
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="item_catalog_vagrant_python35" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="item_catalog_from_git" project-jdk-type="Python SDK" />
 </project>

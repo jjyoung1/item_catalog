@@ -175,7 +175,7 @@ def gconnect():
         user = User()
         user.username = data['name']
         user.password = ''
-        user.email = login_session['email']
+        user.email = email
         user.picture = None
         db.session.add(user)
         db.session.commit()

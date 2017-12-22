@@ -12,7 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="item_catalog_vagrant_python35" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="item_catalog_from_git" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
