@@ -3,14 +3,12 @@ from app.models.user import User
 from itsdangerous import BadSignature, SignatureExpired
 import time
 
+
 class TestUser(TestCase):
     username = 'myname'
     email = 'myname@myname.com'
     password = 'mypass'
     picture = 'photo_url'
-
-    def setUp(self):
-        print("Hello")
 
     def test_password(self):
         user = TestUser.createUser()
@@ -74,11 +72,9 @@ class TestUser(TestCase):
         # with self.assertRaises(SignatureExpired):
         #     User.verify_auth_token(token)
 
-
     # Support methods
     @staticmethod
     def createUser(password=password):
         # noinspection PyArgumentList
         return User(username=TestUser.username, email=TestUser.email,
                     password=password)
-
