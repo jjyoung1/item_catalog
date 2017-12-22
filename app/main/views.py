@@ -25,13 +25,15 @@ from .. import db
 @main.route('/', methods=['GET'])
 @main.route('/cathome/<category_id>', methods=['GET'])
 def home(category_id=None):
-    categories = db.session.query(Category).order_by('name')
+    # categories = db.session.query(Category).order_by('name').all()
+    categories = Category.getAll()
     if not category_id:
-        items = db.session.query(Item).order_by(Item.date_added.desc()).limit(10).all()
+        # items = db.session.query(Item).order_by(Item.date_added.desc()).limit(10).all()
+        items = Item.getItemsByDate()
     else:
         # category_id = db.session.query(Category).filter_by(id=cat_id).one()
-        items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
-
+        # items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
+        items = Item.getItemsByCategory(category_id=category_id)
     return render_template("home.html", categories=categories, items=items)
 
 

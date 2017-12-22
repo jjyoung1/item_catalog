@@ -33,4 +33,13 @@ class Item(db.Model):
     def create(name, description, category_id):
         return 0
 
+    @classmethod
+    def getItemsByDate(cls, max=10):
+        items = db.session.query(Item).order_by(Item.date_added.desc()).limit(max).all()
+        return items
+
+    @classmethod
+    def getItemsByCategory(cls, category_id):
+        items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
+        return items
 
