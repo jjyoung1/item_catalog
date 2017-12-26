@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, \
 
 from .. import db
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy.orm.exc import NoResultFound
 
 class Category(db.Model):
     __tablename__ = 'category'
@@ -32,5 +32,14 @@ class Category(db.Model):
 
     @staticmethod
     def getAll():
-        categories = db.session.query(Category)
+        categories = db.session.query(Category).all()
         return categories
+
+    @staticmethod
+    def getIdByName(category_name):
+        assert category_name
+        try:
+            c = db.session.query(Category).filter_by(name=category_name).one()
+            return c.id
+        except NoResultFound as e:
+            return None

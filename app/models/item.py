@@ -30,7 +30,10 @@ class Item(db.Model):
 
     # Create a new item in the specified category
     @classmethod
-    def create(name, description, category_id):
+    def create(cls, name, description, category_id):
+        item = Item(name=name, description=description, category_id=category_id)
+        db.session.add(item)
+        db.session.commit()
         return 0
 
     @classmethod
