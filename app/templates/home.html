@@ -8,17 +8,20 @@
             <p>No Categories</p>
         {% else %}
             <ul>
-
                 {% for c in categories %}
-                    <li>{{ c.name }}</li>
+                <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name }}</a></li>
                 {% endfor %}
             </ul>
         {% endif %}
     </div>
 
     <div class="col-sm-9 cols-xs-12">
-    <h2>Items</h2>
-    <a href="{{ url_for('main.newitem') }}">Add a new item</a>
+        {% if not category_name %}
+            <h2>Recent Items</h2>
+        {% else %}
+            <h2>{{category_name}} Items</h2>
+        {% endif %}
+        <a href="{{ url_for('main.newitem') }}">Add a new item</a>
         {% if not items %}
             <p>No Items</p>
         {% else %}

@@ -74,7 +74,7 @@ def login():
             login_session['picture'] = user.picture
             next = request.args.get('next')
             if next is None or not next.startswith('/'):
-                next = url_for('main.home')
+                next = url_for('main.homepage')
             return redirect(next)
         flash('Invalid username or password')
     return render_template('auth/login.html', form=form, state=state)
@@ -86,10 +86,10 @@ def logout():
     # if not login_session.get('username'):
     if not current_user.is_authenticated:
         flash("You are not logged in")
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.homepage'))
     else:
         logout_user()
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.homepage'))
         # if login_session.get('google_id'):
         #     return redirect(url_for('auth.gdisconnect'))
         # else:
@@ -185,7 +185,7 @@ def gconnect():
     login_user(user)
     # login_session['user_id'] = user_id
     # login_session['picture'] = user.picture
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.homepage'))
 
 
 @auth.route("/gdisconnect")
@@ -208,7 +208,7 @@ def gdisconnect():
         # del login_session['username']
         del login_session['picture']
 
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.homepage'))
         #
         # response = make_response(json.dumps('Successfully disconnected'), 200)
         # response.headers['Content-Type'] = 'application/json'
@@ -271,7 +271,7 @@ def fbconnect():
     user = User.getInfo(user_id)
     login_user(user)
     flash("you are now logged in as %s" % user.username)
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.homepage'))
 
 
 @auth.route('/fbdisconnect')
@@ -290,7 +290,7 @@ def fbdisconnect():
     del login_session['facebook_id']
     del login_session['picture']
     del login_session['access_token']
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.homepage'))
 
 
 @login_manager.user_loader

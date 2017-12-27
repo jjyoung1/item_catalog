@@ -22,19 +22,27 @@ from .. import db
 
 # CLIENT_ID = gcs.get_client_id()
 
-@main.route('/', methods=['GET'])
-@main.route('/cathome/<category_id>', methods=['GET'])
+@main.route('/', methods=['GET'], endpoint='homepage')
+@main.route('/cathome/<category_id>', endpoint='home_itemlist')
 def home(category_id=None):
     # categories = db.session.query(Category).order_by('name').all()
     categories = Category.getAll()
+    category_name = None
     if not category_id:
         # items = db.session.query(Item).order_by(Item.date_added.desc()).limit(10).all()
         items = Item.getItemsByDate()
     else:
         # category_id = db.session.query(Category).filter_by(id=cat_id).one()
+        category_id = int(category_id)
+        for c in categories:
+            if c.id == category_id:
+                category_name = c.name
+                break
+
+        # category_name = categories[c
         # items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
         items = Item.getItemsByCategory(category_id=category_id)
-    return render_template("home.html", categories=categories, items=items)
+    return render_template("home.html", categories=categories, items=items, category_name=category_name)
 
 
 @main.route('/newitem', methods=['GET', 'POST'])
