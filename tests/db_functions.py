@@ -45,5 +45,5 @@ def item_init():
         Item.create(name=item['name'],
                     description=item['description'],
                     category_id=c_id)
-        i=0
+
 

@@ -2,6 +2,7 @@ import unittest
 from app import create_app, db
 import db_functions as dbf
 import html
+from app.models.category import Category
 
 class AppViewTestCase(unittest.TestCase):
     def setUp(self):
@@ -39,4 +40,19 @@ class AppViewTestCase(unittest.TestCase):
         for i in dbf.item_list:
             i_name = html.escape(i['name'])
             self.assertTrue(i['name'] in rv.get_data(as_text=True))
+
+    def test_category_items(self):
+        dbf.category_init()
+        dbf.item_init()
+        for c in dbf.category_list:
+            c_id = Category.getIdByName(c)
+            rv = self.client.get('/cathome/'+ str(c_id))
+            for i in dbf.item_list:
+                i_c_id = Category.getIdByName(i.get('category'))
+                if i_c_id==c_id:
+                    self.assertTrue(i.get('name') in rv.get_data(as_text=True))
+                else:
+                    self.assertFalse(i.get('name') in rv.get_data(as_text=True))
+
+
 
