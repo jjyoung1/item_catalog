@@ -43,3 +43,11 @@ class Category(db.Model):
             return c.id
         except NoResultFound as e:
             return None
+
+    @staticmethod
+    def getName(category_id):
+        try:
+            c = db.session.query(Category).filter_by(id=category_id).one()
+            return c.name
+        except NoResultFound as e:
+            return None

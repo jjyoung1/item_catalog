@@ -27,22 +27,23 @@ from .. import db
 def home(category_id=None):
     # categories = db.session.query(Category).order_by('name').all()
     categories = Category.getAll()
-    category_name = None
+    category = None
+    # # Convert list of Category objects in map of categories with the id being the key
+    # c_map = dict([(k,v) for k,v in ((c.id, c.name) for c in categories)])
+
     if not category_id:
-        # items = db.session.query(Item).order_by(Item.date_added.desc()).limit(10).all()
         items = Item.getItemsByDate()
     else:
         # category_id = db.session.query(Category).filter_by(id=cat_id).one()
         category_id = int(category_id)
-        for c in categories:
-            if c.id == category_id:
-                category_name = c.name
+        for category in categories:
+            if category.id == category_id:
                 break
 
         # category_name = categories[c
         # items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
         items = Item.getItemsByCategory(category_id=category_id)
-    return render_template("home.html", categories=categories, items=items, category_name=category_name)
+    return render_template("home.html", categories=categories, items=items, category=category)
 
 
 @main.route('/newitem', methods=['GET', 'POST'])
@@ -66,7 +67,7 @@ def newitem():
         db.session.add(item)
         db.session.commit()
         flash("Item {} created".format(name))
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.homepage'))
 
     return render_template('item_form.html', form=form, name=name, description=description, category=category)
 
@@ -81,7 +82,7 @@ def newcategory():
             category_name = form.category_name.data
             Category.create(category_name)
             flash("{} Category created".format(category_name))
-            return redirect(url_for('main.home'))
+            return redirect(url_for('main.homepage'))
         except IntegrityError as e:
             flash("Error: Duplicate category: {} already exists".format(category_name))
             return render_template('item_form.html', form=form, name=category_name)

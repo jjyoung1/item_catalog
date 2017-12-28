@@ -1,36 +1,41 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <div class="col-sm-3 col-xs-12">
-        <h2>Categories</h2>
-        <a href="{{ url_for('main.newcategory') }}">Add a new category</a>
-        {% if not categories %}
-            <p>No Categories</p>
-        {% else %}
-            <ul>
-                {% for c in categories %}
-                <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name }}</a></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+<div class="col-sm-3 col-xs-12">
+    <h2>Categories</h2>
+    <a href="{{ url_for('main.newcategory') }}">Add a new category</a>
+    {% if not categories %}
+    <p>No Categories</p>
+    {% else %}
+    <ul>
+        {% for c in categories %}
+        <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
 
-    <div class="col-sm-9 cols-xs-12">
-        {% if not category_name %}
-            <h2>Recent Items</h2>
-        {% else %}
-            <h2>{{category_name}} Items</h2>
-        {% endif %}
-        <a href="{{ url_for('main.newitem') }}">Add a new item</a>
-        {% if not items %}
-            <p>No Items</p>
-        {% else %}
-            <ul>
+<div class="col-sm-9 cols-xs-12">
+    {% if not category %}
+    <h2>Recent Items</h2>
+    {% else %}
+    <h2>{{category.name}} Items</h2>
+    {% endif %}
+    <a href="{{ url_for('main.newitem') }}">Add a new item</a>
+    {% if not items %}
+    <p>No Items</p>
+    {% else %}
+    <ul>
 
-                {% for i in items %}
-                    <li>{{ i.name }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+        {% for i in items %}
+        <li>{{ i.name }}
+            {% if not category %}
+            ({{i.category.name}})
+            {% endif %}
+
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
 {% endblock %}
