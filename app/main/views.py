@@ -25,7 +25,6 @@ from .. import db
 @main.route('/', methods=['GET'], endpoint='homepage')
 @main.route('/cathome/<category_id>', endpoint='home_itemlist')
 def home(category_id=None):
-    # categories = db.session.query(Category).order_by('name').all()
     categories = Category.getAll()
     category = None
     # # Convert list of Category objects in map of categories with the id being the key
@@ -55,7 +54,7 @@ def newitem():
     form = ItemForm()
     form.category.choices = \
         [(category.id, category.name) for category in Category.getAll()]
-        #[('1', 'Kitchen'), ('2', 'Landscaping')]
+    # [('1', 'Kitchen'), ('2', 'Landscaping')]
 
     if form.validate_on_submit():
         name = form.name.data
