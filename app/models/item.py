@@ -55,3 +55,8 @@ class Item(db.Model):
             item = None
         return item
 
+    @classmethod
+    def delete(cls,item_id):
+        item = Item.getItemById(item_id)
+        db.session.delete(item)
+        db.session.commit()

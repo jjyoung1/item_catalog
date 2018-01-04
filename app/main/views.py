@@ -112,6 +112,23 @@ def editItem(item_id):
         return redirect(url_for('main.displayItem', item_id = item_id))
 
 
+@main.route('/item/delete/<item_id>', methods=['GET','POST'])
+@login_required
+def deleteItem(item_id):
+    # Validate item_id
+    item = Item.getItemById(item_id)
+    if not item:
+        flash('Item {} not found'.format(item_id))
+        return redirect('main.homepage')
+
+    if request.method=='POST':
+        Item.delete(item_id)
+        flash("{} deleted".format(item.name))
+        return redirect(url_for('main.homepage'))
+    else:
+        return render_template('item_delete.html', item=item)
+
+
 @main.route('/newcategory', methods=['GET', 'POST'])
 @login_required
 def newcategory():
