@@ -12,7 +12,7 @@ from .. import has_no_empty_params
 from .forms import CategoryForm, ItemForm
 from ..models.category import Category
 from ..models.item import Item
-from flask_login import login_required
+from flask_login import login_required, current_user
 from secrets import google_client_secrets as gcs
 from .. import db
 
@@ -45,7 +45,17 @@ def home(category_id=None):
     return render_template("home.html", categories=categories, items=items, category=category)
 
 
-@main.route('/newitem', methods=['GET', 'POST'])
+@main.route('/item/<item_id>')
+def displayItem(item_id):
+    item = Item.getItemById(item_id)
+    if not item:
+        flash('Item {} not found'.format(item_id))
+        return redirect('main.homepage')
+
+    return render_template("item_details.html", item=item, user=current_user)
+
+
+@main.route('/item/new', methods=['GET', 'POST'])
 @login_required
 def newitem():
     name = None
@@ -68,7 +78,38 @@ def newitem():
         flash("Item {} created".format(name))
         return redirect(url_for('main.homepage'))
 
-    return render_template('item_form.html', form=form, name=name, description=description, category=category)
+    return render_template('item_form.html', form=form, name=name,
+                           description=description, category=category)
+
+
+@main.route('/item/edit/<item_id>', methods=['GET', 'POST'])
+@login_required
+def editItem(item_id):
+    item = Item.getItemById(item_id)
+    if not item:
+        flash("Item () note found").form(item_id)
+        return redirect(url_for(main.homepage))
+
+    form = ItemForm()
+    form.category.choices = [(category.id, category.name)
+                             for category in Category.getAll()]
+
+    if request.method == 'GET':
+        form.name.data = item.name
+        form.description.data = item.description
+        form.category.data = item.category_id
+        form.category.choices = [(category.id, category.name)
+                                 for category in Category.getAll()]
+        return render_template('item_form.html', form=form, name=item.name,
+                               description=item.description, category=item.category)
+
+    if form.validate_on_submit():
+        item.name = form.data['name']
+        item.description = form.data['description']
+        cat_id = form.data['category']
+        item.category_id = form.data['category']
+        db.session.commit()
+        return redirect(url_for('main.displayItem', item_id = item_id))
 
 
 @main.route('/newcategory', methods=['GET', 'POST'])
@@ -78,7 +119,7 @@ def newcategory():
     category_name = None
     if form.validate_on_submit():
         try:
-            category_name = form.category_name.data
+            category_name = form.category_name.data.lower()
             Category.create(category_name)
             flash("{} Category created".format(category_name))
             return redirect(url_for('main.homepage'))

@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from flask import g, url_for
+from sqlalchemy.orm.exc import NoResultFound
 
 from .. import db
 from .category import Category
@@ -45,4 +46,12 @@ class Item(db.Model):
     def getItemsByCategory(cls, category_id):
         items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
         return items
+
+    @classmethod
+    def getItemById(cls,item_id):
+        try:
+            item = db.session.query(Item).filter_by(id=item_id).one()
+        except NoResultFound:
+            item = None
+        return item
 

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="col-xs-12">
+
+    <h1>{{item.name | title}}</h1>
+    <h2>Description</h2>
+    <p>{{item.description}}</p>
+    {% if user.is_authenticated %}
+        <a href = "{{ url_for('main.editItem', item_id = item.id)}}">Edit</a>
+    {% endif %}
+</div>
+{% endblock %}

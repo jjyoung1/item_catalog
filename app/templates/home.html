@@ -9,7 +9,7 @@
     {% else %}
     <ul>
         {% for c in categories %}
-        <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name }}</a></li>
+        <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name|title }}</a></li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -19,7 +19,7 @@
     {% if not category %}
     <h2>Recent Items</h2>
     {% else %}
-    <h2>{{category.name}} Items</h2>
+    <h2>{{category.name|title}} Items</h2>
     {% endif %}
     <a href="{{ url_for('main.newitem') }}">Add a new item</a>
     {% if not items %}
@@ -28,9 +28,9 @@
     <ul>
 
         {% for i in items %}
-        <li>{{ i.name }}
+        <li><a href="{{url_for('main.displayItem', item_id = i.id)}}">{{ i.name }}</a>
             {% if not category %}
-            ({{i.category.name}})
+            ({{i.category.name|capitalize }})
             {% endif %}
 
         </li>
