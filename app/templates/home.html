@@ -8,6 +8,7 @@
     <p>No Categories</p>
     {% else %}
     <ul>
+        <li><a href="{{url_for('main.homepage')}}">Recent Items</a></li>
         {% for c in categories %}
         <li><a href="{{ url_for('main.home_itemlist',category_id = c.id)}}">{{ c.name|title }}</a></li>
         {% endfor %}
