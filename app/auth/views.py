@@ -13,6 +13,7 @@ from oauth2client import client
 
 from ..models.user import User
 from . import auth, basic_auth
+from utils import redirect_back, get_redirect_target
 from .. import login_manager
 from secrets import google_client_secrets as gcs, \
     facebook_client_secrets as fbcs
@@ -66,16 +67,18 @@ def register():
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
     login_session['state'] = state
-    form = LoginForm()
+    next = get_redirect_target()
+    form = LoginForm(next=next)
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             login_session['picture'] = user.picture
-            next = request.args.get('next')
-            if next is None or not next.startswith('/'):
-                next = url_for('main.homepage')
-            return redirect(next)
+            # next = request.args.get('next')
+            # if next is None or not next.startswith('/'):
+            #     next = url_for('main.homepage')
+            return redirect_back('main.homepage')
         flash('Invalid username or password')
     return render_template('auth/login.html', form=form, state=state)
 
