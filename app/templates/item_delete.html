@@ -6,6 +6,7 @@
     <h1>Delete {{item.name | title}}</h1>
     <form action="{{ url_for('main.deleteItem', item_id=item.id)}}" method="post">
         <p>Are you sure you want to delete {{item.name | title}}?</p>
+        <input type="hidden" name="next" value="{{next}}">
         <button type="submit">Delete</button>
     </form>
 </div>

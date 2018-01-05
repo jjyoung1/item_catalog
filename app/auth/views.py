@@ -7,19 +7,19 @@ import requests  # http library
 from flask import render_template, request, make_response, abort, flash, \
     redirect, url_for, g
 from flask import session as login_session, jsonify
-from flask_httpauth import HTTPBasicAuth
+# from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager, login_user, logout_user, current_user
 from oauth2client import client
 
-from ..models.user import User
-from . import auth, basic_auth
-from utils import redirect_back, get_redirect_target
-from .. import login_manager
+from app.models.user import User
+from app.auth import auth, basic_auth
+from app.auth.utils import redirect_back, get_redirect_target
+from app import login_manager
 from secrets import google_client_secrets as gcs, \
     facebook_client_secrets as fbcs
 
-from .. import db
-from .forms import LoginForm, RegistrationForm
+from app import db
+from app.auth.forms import LoginForm, RegistrationForm
 
 CLIENT_ID = gcs.get_client_id()
 
