@@ -1,55 +1,76 @@
 {% extends "bootstrap/base.html" %}
 
 {% block styles %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/styles.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/styles.css') }}">
 {% endblock %}
 
 {% block title %}Catalog App{% endblock %}
 
 {% block body %}
-    <div class="col-sm-9 col-xs-12">
+<div>
+    <div class="col-sm-8 col-xs-12">
         <h1>Catalog App</h1>
     </div>
-    <div class="col-sm-3 col-xs-12">
-        {#                        {% if session.username %}#}
+    <div class="col-sm-4 col-xs-12">
+        {# {% if session.username %}#}
         {% if current_user.is_authenticated %}
-            <p>
-                Signed in: {{ current_user.username }}
-                <img class="image-tn" src="{{ session.picture }}">
-            </p>
-            <a href="{{ url_for('auth.logout') }}">Sign Out</a>
+        <p>
+            Signed in: {{ current_user.username }}
+            <img class="image-tn" src="{{ session.picture }}">
+        </p>
+        <a href="{{ url_for('auth.logout') }}">Sign Out</a>
         {% else %}
-            <a href="{{ url_for('auth.login') }}">Log In</a>
+        <a class="btn btn-primary" href="{{ url_for('auth.login') }}"
+               >Login</a>
+        <!--<a href="{{ url_for('auth.login') }}">Log In</a>-->
         {% endif %}
     </div>
-    {{ super() }}
+</div>
+{{ super() }}
 {% endblock %}
 
 {#{% block navbar %}#}
-{#    <div class="navbar-header">#}
-{#        <div class="navbar navbar-default" role="navigation">#}
-{#            <div class="container">#}
-{#                <div class="navbar-header">#}
-{#                </div>#}
-{#                <div class="navbar-collapse collapse ">#}
-{#                    <ul class="nav navbar-nav navbar-right ">#}
-{#                    </ul>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+{#
+<div class="navbar-header">#}
+    {#
+    <div class="navbar navbar-default" role="navigation">#}
+        {#
+        <div class="container">#}
+            {#
+            <div class="navbar-header">#}
+                {#
+            </div>
+            #}
+            {#
+            <div class="navbar-collapse collapse ">#}
+                {#
+                <ul class="nav navbar-nav navbar-right ">#}
+                    {#
+                </ul>
+                #}
+                {#
+            </div>
+            #}
+            {#
+        </div>
+        #}
+        {#
+    </div>
+    #}
+    {#
+</div>#}
 {#{% endblock %}#}
 
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        <ul class="flashes col-sm-12">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endwith %}
+{% with messages = get_flashed_messages() %}
+<ul class="flashes col-sm-12">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endwith %}
 
-    {% block page_content %}{% endblock %}
+{% block page_content %}{% endblock %}
 
 {% endblock %}
