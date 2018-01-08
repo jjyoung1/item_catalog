@@ -208,25 +208,14 @@ def gdisconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
-    # TODO: Investigate if the session variables should be deleted even on error
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['google_id']
-        # del login_session['username']
-        # del login_session['picture']
+    # Even if failure occurred, we want to delete the google access token and
+    # id from session
+    del login_session['access_token']
+    del login_session['google_id']
 
-        # return redirect(url_for('main.homepage'))
-        return
-        #
-        # response = make_response(json.dumps('Successfully disconnected'), 200)
-        # response.headers['Content-Type'] = 'application/json'
-        # return response
-    else:
-        response = make_response(json.dumps('Failed to revoke token for given user'),
-                                 400)
-        response.headers = 'application/json'
-        # return response
-        return
+    if result['status'] != '200':
+        flash("Failed to revoke google token for given user")
+    return
 
 @auth.route('/fbconnect', methods=['POST'])
 def fbconnect():
