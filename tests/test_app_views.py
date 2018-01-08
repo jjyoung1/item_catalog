@@ -46,7 +46,7 @@ class AppViewTestCase(unittest.TestCase):
         dbf.item_init()
         for c in dbf.category_list:
             c_id = Category.getIdByName(c)
-            rv = self.client.get('/cathome/'+ str(c_id))
+            rv = self.client.get('/category/'+ str(c_id))
             for i in dbf.item_list:
                 i_c_id = Category.getIdByName(i.get('category'))
                 if i_c_id==c_id:
