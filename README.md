@@ -17,6 +17,8 @@ appropriate virtual environmnet
 
 ## Startup
 Execute catalog.py within the virutal environment to start program
+By default, using the flask development server, the homepage is located
+at http://localhost:5000/
 
 ## URL Summary
 * / - homepage of Catalog App
