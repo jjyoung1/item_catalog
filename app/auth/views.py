@@ -76,11 +76,8 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user is not None and user.verify_password(form.password.data):
-            login_user(user)
+            login_user(user, remember=form.remember_me)
             login_session['picture'] = user.picture
-            # next = request.args.get('next')
-            # if next is None or not next.startswith('/'):
-            #     next = url_for('main.homepage')
             return redirect_back('main.homepage')
         flash('Invalid username or password')
     return render_template('auth/login.html', form=form, state=state)
@@ -95,9 +92,11 @@ def logout():
         logout_user()
         if login_session.get('picture'):
             del login_session['picture']
-        if login_session.get('google_id'):
+
+        provider = login_session.get('provider')
+        if provider == 'google':
             gdisconnect()
-        else:
+        elif provider == 'facebook':
             fbdisconnect()
 
         return redirect(url_for('main.homepage'))
@@ -172,6 +171,7 @@ def gconnect():
 
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
+    login_session['provider'] = 'google'
 
     # Get profile info from ID token
     login_session['google_id'] = credentials.id_token['sub']
@@ -216,6 +216,7 @@ def gdisconnect():
     # id from session
     del login_session['access_token']
     del login_session['google_id']
+    del login_session['provider']
 
     if result['status'] != '200':
         flash("Failed to revoke google token for given user")
