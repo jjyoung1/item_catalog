@@ -1,8 +1,20 @@
-
+body {
+    margin: 40px;
+    background: lightblue;
+}
 .image-tn {
     width: 40px;
     height: 40px;
     border-radius: 20px;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
+}
+
+.login_block {
+    margin-top: 20px;
+    padding-left: 20px;
+    }
+
+.header {
+    background: lightskyblue;
 }
