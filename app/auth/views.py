@@ -7,7 +7,6 @@ import requests  # http library
 from flask import render_template, request, make_response, abort, flash, \
     redirect, url_for, g
 from flask import session as login_session, jsonify
-# from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager, login_user, logout_user, current_user
 from oauth2client import client
 
@@ -87,10 +86,8 @@ def login():
     return render_template('auth/login.html', form=form, state=state)
 
 
-# TODO: Improve on logout response to user
 @auth.route('/logout', methods=['GET', 'POST'])
 def logout():
-    # if not login_session.get('username'):
     if not current_user.is_authenticated:
         flash("You are not logged in")
         return redirect(url_for('main.homepage'))
@@ -102,7 +99,6 @@ def logout():
             gdisconnect()
         else:
             fbdisconnect()
-            # return redirect(url_for('auth.fbdisconnect'))
 
         return redirect(url_for('main.homepage'))
 
@@ -183,6 +179,11 @@ def gconnect():
     login_session['picture'] = data['picture']
 
     user_id = User.getID(email)
+
+    # If user does not exist, then it is created with a disabled password
+    # After this, login is not possible using the site login page until
+    # a valid password is specified
+    # TODO: enable password setting and changing
     if not user_id:
         user = User()
         user.username = data['name']
@@ -195,12 +196,9 @@ def gconnect():
 
     user = User.getInfo(user_id)
     login_user(user)
-    # login_session['user_id'] = user_id
-    # login_session['picture'] = user.picture
     return redirect(url_for('main.homepage'))
 
 
-# @auth.route("/gdisconnect")
 def gdisconnect():
     # Only disconnect a connected user.
     access_token = login_session.get("access_token")
@@ -245,9 +243,8 @@ def fbconnect():
     data = json.loads(result.decode())
 
     # Use token to get user info from API
-    # userinfo_url = "https://graph.facebook.com/V2.10/me"
     token = "access_token=" + data['access_token']
-    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture'\
+    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture' \
           % token
 
     h = httplib2.Http()
@@ -257,8 +254,6 @@ def fbconnect():
     print("API JSON reuslt: %s" % result)
     data = json.loads(result.decode())
     login_session['provider'] = 'facebook'
-    # login_session['username'] = data['name']
-    # login_session['email'] = data['email']
     login_session['facebook_id'] = data['id']
     login_session['picture'] = data['picture']['data']['url']
     login_session['access_token'] = access_token
@@ -281,7 +276,6 @@ def fbconnect():
     return redirect(url_for('main.homepage'))
 
 
-@auth.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session.get('facebook_id')
     # The access token must be included to successfully logout
@@ -293,10 +287,7 @@ def fbdisconnect():
     result = h.request(url, 'DELETE')[1]
 
     del login_session['provider']
-    # del login_session['username']
-    # del login_session['email']
     del login_session['facebook_id']
-    # del login_session['picture']
     del login_session['access_token']
     return redirect(url_for('main.homepage'))
 
@@ -308,4 +299,3 @@ def load_user(user_id):
 
 def init_app(app):
     ''''''
-    # basic_auth.init_app(app)

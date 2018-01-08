@@ -6,7 +6,7 @@ import random, string
 from .. import db
 from .. import login_manager
 
-# You will use this secret key to create and verify your tokens
+# secret key used to create and verify auth tokens
 secret_key = ''.join(
     random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 

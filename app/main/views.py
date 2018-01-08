@@ -1,12 +1,7 @@
-# import json  # Lib: Convert in-memory python objects to a serialized representation in json
-
 from flask import url_for, request, abort, g, render_template, flash
 from flask import current_app, redirect
-
 from sqlalchemy.exc import IntegrityError
-
 from app import models
-# from app import has_no_empty_params
 from . import main
 from app import has_no_empty_params
 from app.main.forms import CategoryForm, ItemForm
@@ -18,30 +13,22 @@ from app import db
 from app.auth.utils import redirect_back, get_redirect_target
 
 
-# Converts return value from a function into a real response
-#    object that can be sent to the client
-
-# CLIENT_ID = gcs.get_client_id()
-
 @main.route('/', methods=['GET'], endpoint='homepage')
 @main.route('/category/<category_id>', endpoint='home_itemlist')
 def home(category_id=None):
     categories = Category.getAll()
     category = None
-    # # Convert list of Category objects in map of categories with the id being the key
-    # c_map = dict([(k,v) for k,v in ((c.id, c.name) for c in categories)])
 
+    # Category is not specified.  Show latest items
     if not category_id:
         items = Item.getItemsByDate()
+    # Show items for specified category
     else:
-        # category_id = db.session.query(Category).filter_by(id=cat_id).one()
         category_id = int(category_id)
         for category in categories:
             if category.id == category_id:
                 break
 
-        # category_name = categories[c
-        # items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
         items = Item.getItemsByCategory(category_id=category_id)
     return render_template("home.html", categories=categories, items=items,
                            category=category)
@@ -67,7 +54,6 @@ def newitem():
     form = ItemForm(next=next)
     form.category.choices = \
         [(category.id, category.name) for category in Category.getAll()]
-    # [('1', 'Kitchen'), ('2', 'Landscaping')]
 
     if form.validate_on_submit():
         name = form.name.data
@@ -154,6 +140,8 @@ def newcategory():
     return render_template('item_form.html', form=form, name=category_name)
 
 
+# For development purposes.  Shows the static routes in the flask
+# routing table
 @main.route("/site-map")
 def site_map():
     links = []
