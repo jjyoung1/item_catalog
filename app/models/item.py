@@ -10,6 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from .. import db
 from .category import Category
 
+
 class Item(db.Model):
     ''''''
     __tablename__ = 'item'
@@ -32,23 +33,26 @@ class Item(db.Model):
     # Create a new item in the specified category
     @classmethod
     def create(cls, name, description, category_id):
-        item = Item(name=name, description=description, category_id=category_id)
+        item = Item(name=name, description=description,
+                    category_id=category_id)
         db.session.add(item)
         db.session.commit()
         return 0
 
     @classmethod
     def getItemsByDate(cls, max=10):
-        items = db.session.query(Item).order_by(Item.date_added.desc()).limit(max).all()
+        items = db.session.query(Item).order_by(Item.date_added.desc()).limit(
+            max).all()
         return items
 
     @classmethod
     def getItemsByCategory(cls, category_id):
-        items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
+        items = db.session.query(Item).filter_by(
+            category_id=category_id).order_by('name')
         return items
 
     @classmethod
-    def getItemById(cls,item_id):
+    def getItemById(cls, item_id):
         try:
             item = db.session.query(Item).filter_by(id=item_id).one()
         except NoResultFound:
@@ -56,7 +60,7 @@ class Item(db.Model):
         return item
 
     @classmethod
-    def delete(cls,item_id):
+    def delete(cls, item_id):
         item = Item.getItemById(item_id)
         db.session.delete(item)
         db.session.commit()

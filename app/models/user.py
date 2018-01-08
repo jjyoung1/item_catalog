@@ -1,18 +1,21 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
+                          BadSignature, SignatureExpired)
 import random, string
 from .. import db
 from .. import login_manager
 
 # You will use this secret key to create and verify your tokens
-secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+secret_key = ''.join(
+    random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    username = db.Column(db.String(64), unique=True, nullable=False,
+                         index=True)
     password_hash = db.Column(db.String(128))
     email = db.Column(db.String(64), nullable=False, unique=True, index=True)
     picture = db.Column(db.String(250))
@@ -69,7 +72,6 @@ class User(UserMixin, db.Model):
         user_id = data['id']
         return user_id
 
-
     # Helper functions for User
     #
     # Create a new User
@@ -92,7 +94,6 @@ class User(UserMixin, db.Model):
         # return id of created user
         return User.getID(email)
 
-
     @staticmethod
     def getID(email):
         try:
@@ -100,7 +101,6 @@ class User(UserMixin, db.Model):
             return user.id
         except:
             return None
-
 
     @staticmethod
     def getInfo(user_id):

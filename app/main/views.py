@@ -43,7 +43,8 @@ def home(category_id=None):
         # category_name = categories[c
         # items = db.session.query(Item).filter_by(category_id=category_id).order_by('name')
         items = Item.getItemsByCategory(category_id=category_id)
-    return render_template("home.html", categories=categories, items=items, category=category)
+    return render_template("home.html", categories=categories, items=items,
+                           category=category)
 
 
 @main.route('/item/<item_id>')
@@ -104,7 +105,8 @@ def editItem(item_id):
         form.category.choices = [(category.id, category.name)
                                  for category in Category.getAll()]
         return render_template('item_form.html', form=form, name=item.name,
-                               description=item.description, category=item.category)
+                               description=item.description,
+                               category=item.category)
 
     if form.validate_on_submit():
         item.name = form.data['name']
@@ -115,7 +117,7 @@ def editItem(item_id):
         return redirect_back('main.homepage')
 
 
-@main.route('/item/<item_id>/delete', methods=['GET','POST'])
+@main.route('/item/<item_id>/delete', methods=['GET', 'POST'])
 @login_required
 def deleteItem(item_id):
     # Validate item_id
@@ -125,7 +127,7 @@ def deleteItem(item_id):
         return redirect_back('main.homepage')
 
     next = get_redirect_target()
-    if request.method=='POST':
+    if request.method == 'POST':
         Item.delete(item_id)
         flash("{} deleted".format(item.name))
         return redirect(url_for('main.homepage'))
@@ -145,8 +147,10 @@ def newcategory():
             flash("{} Category created".format(category_name))
             return redirect(url_for('main.homepage'))
         except IntegrityError as e:
-            flash("Error: Duplicate category: {} already exists".format(category_name))
-            return render_template('item_form.html', form=form, name=category_name)
+            flash("Error: Duplicate category: {} already exists".format(
+                category_name))
+            return render_template('item_form.html', form=form,
+                                   name=category_name)
     return render_template('item_form.html', form=form, name=category_name)
 
 

@@ -1,7 +1,6 @@
 from app.models.category import Category
 from app.models.item import Item
 
-
 category_list = (
     'Kitchen', 'Entertainment', 'Storage'
 )
@@ -45,5 +44,3 @@ def item_init():
         Item.create(name=item['name'],
                     description=item['description'],
                     category_id=c_id)
-
-

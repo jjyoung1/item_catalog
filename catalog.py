@@ -2,21 +2,17 @@
 import os
 import sys
 import click
+from app import create_app, db
+from app.models.category import Category
+from app.models.item import Item
+from app.models.user import User
 
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
     import coverage
+
     COV = coverage.coverage(branch=True, include='app/*')
     COV.start()
-
-# from flask_script import Server, Manager
-# from flask import g
-from app import create_app, db
-from flask import g
-
-from app.models.category import Category
-from app.models.item import Item
-from app.models.user import User
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 ctx = app.app_context()
@@ -59,8 +55,6 @@ def test(coverage):
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
-
-
 
 # if __name__ == '__main__':
 #     app.debug = True

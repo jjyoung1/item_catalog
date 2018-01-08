@@ -32,7 +32,8 @@ def verify_password(username_or_token, password):
         user = db.session.query(User).filter_by(id=user_id).one()
     else:
         # Attempt to get user from DB
-        user = db.session.query(User).filter_by(username=username_or_token).first()
+        user = db.session.query(User).filter_by(
+            username=username_or_token).first()
         if not user or not user.verify_password(password):
             return False  # Return invalid user
     g.user = user
@@ -56,7 +57,8 @@ def register():
         user = User(email=form.email.data,
                     username=form.username.data,
                     password=form.password.data,
-                    picture=url_for('static', filename='img/generic_user.jpg', _external=True))
+                    picture=url_for('static', filename='img/generic_user.jpg',
+                                    _external=True))
         db.session.add(user)
         flash('Account Created')
         return redirect(url_for('auth.login'))
@@ -65,7 +67,9 @@ def register():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    state = ''.join(
+        random.choice(string.ascii_uppercase + string.digits) for x in
+        range(32))
     login_session['state'] = state
     next = get_redirect_target()
     form = LoginForm(next=next)
@@ -162,8 +166,9 @@ def gconnect():
 
     stored_google_id = login_session.get('google_id')
     if stored_access_token is not None and google_id == stored_google_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'),
+            200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -200,7 +205,8 @@ def gdisconnect():
     # Only disconnect a connected user.
     access_token = login_session.get("access_token")
     if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('Current user not connected.'),
+                                 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Execute HTTP Get request to revoke current token.
@@ -217,6 +223,7 @@ def gdisconnect():
         flash("Failed to revoke google token for given user")
     return
 
+
 @auth.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if (request.args.get('state')) != login_session['state']:
@@ -226,8 +233,10 @@ def fbconnect():
     access_token = request.data.decode()
 
     # Exchange client token for long-lived server-side token
-    app_id = json.loads(open(fbcs.get_secrets_path(), 'r').read())['web']['app_id']
-    app_secret = json.loads(open(fbcs.get_secrets_path(), 'r').read())['web']['app_secret']
+    app_id = json.loads(open(fbcs.get_secrets_path(), 'r').read())['web'][
+        'app_id']
+    app_secret = json.loads(open(fbcs.get_secrets_path(), 'r').read())['web'][
+        'app_secret']
     url = 'https://graph.facebook.com/v2.10/oauth/' \
           'access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s' \
           '&fb_exchange_token=%s' % (app_id, app_secret, access_token)
@@ -238,7 +247,8 @@ def fbconnect():
     # Use token to get user info from API
     # userinfo_url = "https://graph.facebook.com/V2.10/me"
     token = "access_token=" + data['access_token']
-    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture' % token
+    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture'\
+          % token
 
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -277,7 +287,8 @@ def fbdisconnect():
     # The access token must be included to successfully logout
     access_token = login_session.get('access_token')
 
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id, access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % \
+          (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
 

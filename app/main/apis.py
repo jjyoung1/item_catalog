@@ -11,6 +11,7 @@ def getCatalog():
     items = db.session.query(Item).all()
     return jsonify(items=[i.serialize for i in items])
 
+
 @main.route('/api/item/<item_id>')
 def getItem(item_id):
     item = Item.getItemById(item_id)

@@ -5,6 +5,7 @@ from .. import db
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
+
 class Category(db.Model):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
@@ -24,7 +25,8 @@ class Category(db.Model):
             category = Category(name=category_name)
             db.session.add(category)
             db.session.commit()
-            category = db.session.query(Category).filter_by(name=category_name).one()
+            category = db.session.query(Category).filter_by(
+                name=category_name).one()
             return category
         except IntegrityError as e:
             db.session.rollback()
