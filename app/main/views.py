@@ -24,7 +24,7 @@ from app.auth.utils import redirect_back, get_redirect_target
 # CLIENT_ID = gcs.get_client_id()
 
 @main.route('/', methods=['GET'], endpoint='homepage')
-@main.route('/cathome/<category_id>', endpoint='home_itemlist')
+@main.route('/category/<category_id>', endpoint='home_itemlist')
 def home(category_id=None):
     categories = Category.getAll()
     category = None
@@ -84,7 +84,7 @@ def newitem():
                            description=description, category=category)
 
 
-@main.route('/item/edit/<item_id>', methods=['GET', 'POST'])
+@main.route('/item/<item_id>/edit', methods=['GET', 'POST'])
 @login_required
 def editItem(item_id):
     item = Item.getItemById(item_id)
@@ -115,7 +115,7 @@ def editItem(item_id):
         return redirect_back('main.homepage')
 
 
-@main.route('/item/delete/<item_id>', methods=['GET','POST'])
+@main.route('/item/<item_id>/delete', methods=['GET','POST'])
 @login_required
 def deleteItem(item_id):
     # Validate item_id
@@ -133,7 +133,7 @@ def deleteItem(item_id):
         return render_template('item_delete.html', item=item, next=next)
 
 
-@main.route('/newcategory', methods=['GET', 'POST'])
+@main.route('/category/new', methods=['GET', 'POST'])
 @login_required
 def newcategory():
     form = CategoryForm()
