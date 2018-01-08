@@ -92,11 +92,15 @@ def logout():
         return redirect(url_for('main.homepage'))
     else:
         logout_user()
+        if login_session.get('picture'):
+            del login_session['picture']
+        if login_session.get('google_id'):
+            gdisconnect()
+        else:
+            fbdisconnect()
+            # return redirect(url_for('auth.fbdisconnect'))
+
         return redirect(url_for('main.homepage'))
-        # if login_session.get('google_id'):
-        #     return redirect(url_for('auth.gdisconnect'))
-        # else:
-        #     return redirect(url_for('auth.fbdisconnect'))
 
 
 @auth.route('/gconnect', methods=['POST'])
@@ -191,7 +195,7 @@ def gconnect():
     return redirect(url_for('main.homepage'))
 
 
-@auth.route("/gdisconnect")
+# @auth.route("/gdisconnect")
 def gdisconnect():
     # Only disconnect a connected user.
     access_token = login_session.get("access_token")
@@ -209,9 +213,10 @@ def gdisconnect():
         del login_session['access_token']
         del login_session['google_id']
         # del login_session['username']
-        del login_session['picture']
+        # del login_session['picture']
 
-        return redirect(url_for('main.homepage'))
+        # return redirect(url_for('main.homepage'))
+        return
         #
         # response = make_response(json.dumps('Successfully disconnected'), 200)
         # response.headers['Content-Type'] = 'application/json'
@@ -220,8 +225,8 @@ def gdisconnect():
         response = make_response(json.dumps('Failed to revoke token for given user'),
                                  400)
         response.headers = 'application/json'
-        return response
-
+        # return response
+        return
 
 @auth.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -263,7 +268,7 @@ def fbconnect():
     user_id = User.getID(data['email'])
     if not user_id:
         user = User()
-        user.username = login_session['username']
+        user.username = data['username']
         user.password = ''
         user.email = data['email']
         user.picture = None
@@ -288,10 +293,10 @@ def fbdisconnect():
     result = h.request(url, 'DELETE')[1]
 
     del login_session['provider']
-    del login_session['username']
-    del login_session['email']
+    # del login_session['username']
+    # del login_session['email']
     del login_session['facebook_id']
-    del login_session['picture']
+    # del login_session['picture']
     del login_session['access_token']
     return redirect(url_for('main.homepage'))
 
