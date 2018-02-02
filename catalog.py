@@ -6,6 +6,11 @@ from app import create_app, db
 from app.models.category import Category
 from app.models.item import Item
 from app.models.user import User
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__),'.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
 
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
