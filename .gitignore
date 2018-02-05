@@ -171,4 +171,4 @@ item-catalog-dev.sqlite
 item-app-dev.sqlite
 item-app-test.sqlite
 tmp/
-/.env-lightsail
+.env-lightsail
