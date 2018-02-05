@@ -34,9 +34,22 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = \
-        os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'item-app.sqlite')
+    db_url = os.environ.get('DATABASE_URL')
+    db_user = os.environ.get('DATABASE_USER')
+    db_password = os.environ.get('DATABASE_PASSWORD')
+    SQLALCHEMY_DATABASE_URI =\
+        'postgresq+psycopg2;//' + db_user + ':' + db_password + 'dbname?host=/var/run/postgresql'
+
+    @classmethod
+    def init_app(cls, app):
+        # log to syslog
+        import logging
+        from logging.handlers import SysLogHandler
+        syslog_handler = SysLogHandler()
+        syslog_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(syslog_handler)
+
+
 
 
 config = {
