@@ -34,11 +34,11 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    db_url = os.environ.get('DATABASE_URL')
-    db_user = os.environ.get('DATABASE_USER')
-    db_password = os.environ.get('DATABASE_PASSWORD')
+    db_url = os.environ.get('DATABASE_URL') or 'catalog?host=/var/run/postgresql'
+    db_user = os.environ.get('DATABASE_USER') or 'catalog'
+    db_password = os.environ.get('DATABASE_PASSWORD') or 'catalog'
     SQLALCHEMY_DATABASE_URI =\
-        'postgresq+psycopg2;//' + db_user + ':' + db_password + 'dbname?host=/var/run/postgresql'
+        'postgresql+psycopg2://catalog:mysecretpassword@localhost/catalog'
 
     @classmethod
     def init_app(cls, app):
