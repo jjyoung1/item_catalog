@@ -1,69 +1,73 @@
-# item_catalog
-Catalog app to manage item categories and items.  Implements both Web
-and Restful interfaces
+# Linux Server Configuration Project
 
-## Getting the source code
-The source code is hosted on Github at:
-https://github.com/jjyoung1/item_catalog
+## Project Documentation
+The original documentation for the Item Catalog project is located [here](documentation/project.md)
 
-## Virtual Enviornment Creation
-Python Version: 3.5.2
+## Site Information
+Server Address: 18.218.247.187
 
-The requirements.txt file contains the information required to create
-the virtual environment.  The following command will create the
-appropriate virtual environmnet
+DNS Name: http://ec2-18-218-247-187.us-east-2.compute.amazonaws.com
 
-* $ virtualenv --python='path to Python version 3.5.2' requirements.txt
+## Software Requirements
+### Server Packages
+* Apache2
+* finger
+* Uncomplicated Firewall (ufw)
+* Apache2 with mod-wsgi for Python3
+* Postgreql Version 10
+*
 
-## Startup
-Execute catalog.py within the virutal environment to start program
-By default, using the flask development server, the homepage is located
-at http://localhost:5000/
 
-## URL Summary
-* / - homepage of Catalog App
-* /auth/gdisconnect - Disconnect from Google OAuth login session
-* /auth/fbdisconnect - Disconnect from Facebook OAuth login session
-* /auth/login - Login page
-* /auth/logout - Logout of any existing login sessions
-* /category/new - create new category
-* /catalog/\<category id\> - List items in specified category
-* /catalog/\<category id\>/item/new - Create new item in category
-* /item/\<item id\> - Item description
-* /item/edit/\<item id\> - Edit item
-* /catalog/\<category\>/\<item\>/delete - Delete item confirmation
-* /site-map - For development purpose to check flask routing table
-* /api/catalog - REST endpoint for reading the entire catalog
+## References
+[Amazon Lightsail Documentation](https://lightsail.aws.amazon.com/ls/docs/all)
 
-## Executing Self Tests
-Within the directory containing **catalog.py** execute the following:
-* $ source venv/bin/activate
-* $ export FLASK_APP=catalog.py
-* $ export FLASK_COVERAGE=1
-* $ export FLASK_DEBUG=1
-* $ flask test
+### Digital Ocean
+https://www.digitalocean.com/community/tutorials/how-to-run-django-with-mod_wsgi-and-apache-with-a-virtualenv-python-environment-on-a-debian-vps
 
-## Development Notes
-The basic architecture was derived from the information in the pre-release
-version (available through [Safari Books Online](https://www.safaribooksonline.com/library/view/flask-web-development/9781491991725/)) of the book:
+https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu-16-04
 
-[Flask Web Development: Developing Web Applications with Python 2nd Edition
-by Miguel Grinberg](https://www.amazon.com/Flask-Web-Development-Developing-Applications/dp/1491991739/ref=sr_1_2?ie=UTF8&qid=1515431839&sr=8-2&keywords=Flask+Web+Development)
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04
 
-The Google and Facebook login processes were updated from the methods provided
-by Udacity to the current methods specified by the OAuth providers
+### Flask
+[Flask running in Virtual Environments on Apache](http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/)
 
-The secure handling of redirection from the web pages has been implemented
-using the method list [here](http://flask.pocoo.org/snippets/62/)
+[Flask Web Development, 2nd Editionby Miguel Grinberg, O'Reilly Media, Inc., 2018](https://www.safaribooksonline.com/library/view/flask-web-development/9781491991725/part02.html)
 
-PEP8 has been purposely violated in some files w.r.t. line length exceeding
-79 characters.  This is to improve readability in the code.
+### Postgres
+[Postgres Documentation](https://www.postgresql.org/docs/10/static)
 
-## TODO
-* A basic REST api for reading the entire catalog is available.  Addition
-api implementations need to be done
-* Fix test comparisions related to Jinja encode/decode
-* flask-wtf was used to auto-generate the form fields in the temple.
-  However, this will be investigate as to whether manual generation of the
-  template will provide greater flexibility and isolation between code
-  and styling
+### SQLAlchemy
+[SQL Alchemy Datanase Connections](http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html)
+
+[SQL Alchemy Virtual environments with wsgi](http://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html)
+
+
+## Server Configuration
+* Create Ubuntu 16.04 instance on Amazon Lightsail
+* Update all packages installed
+* Removed unusued packages
+* Installed finger
+* Installed ufw and configured it with the following rules
+
+	To | Action | From
+	---|--------|-----
+	80/tcp |                    ALLOW |      Anywhere
+	2200/tcp |                  ALLOW |      Anywhere
+	123            |            ALLOW |      Anywhere
+	80/tcp (v6)  |              ALLOW |      Anywhere (v6)
+	2200/tcp (v6)  |            ALLOW  |     Anywhere (v6)
+	123 (v6)     |              ALLOW  |     Anywhere (v6)
+
+* Modified the Lightsail firewall to match the machine firewall rules
+* Configured Apache to serve wsgi applications
+* Installed Postgres
+* Installed Git
+* Created the virtual environment to run the application and installed
+the python packages specified in the 'requirements.txt' file
+* created a 'catalog' user
+* cloned the git repository into the /home/catalog/public_wsgi directory
+* Configured the Apache default VirtualHost to serve the catalog app within the virtual environment
+* Created and installed rsa keys for users: jjyoung and grader
+* Modified sshd to disallow password login and allow only key-based authentication
+* Enabled 'sudo' for designated users
+
