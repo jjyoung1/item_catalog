@@ -31,7 +31,7 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgres
 ### Flask
 [Flask running in Virtual Environments on Apache](http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/)
 
-[Flask Web Development, 2nd Editionby Miguel Grinberg, O'Reilly Media, Inc., 2018](https://www.safaribooksonline.com/library/view/flask-web-development/9781491991725/part02.html)
+[Flask Web Development, 2nd Edition by Miguel Grinberg, O'Reilly Media, Inc., 2018](https://www.safaribooksonline.com/library/view/flask-web-development/9781491991725/part02.html)
 
 ### Postgres
 [Postgres Documentation](https://www.postgresql.org/docs/10/static)
@@ -40,6 +40,12 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgres
 [SQL Alchemy Datanase Connections](http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html)
 
 [SQL Alchemy Virtual environments with wsgi](http://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html)
+
+### Udacity
+[Linux Server Configuration](https://classroom.udacity.com/nanodegrees/nd004/parts/ab002e9a-b26c-43a4-8460-dc4c4b11c379)
+
+[Backend Databases and Applications](https://classroom.udacity.com/nanodegrees/nd004/parts/8d3e23e1-9ab6-47eb-b4f3-d5dc7ef27bf0)
+
 
 
 ## Server Configuration
@@ -70,4 +76,5 @@ the python packages specified in the 'requirements.txt' file
 * Created and installed rsa keys for users: jjyoung and grader
 * Modified sshd to disallow password login and allow only key-based authentication
 * Enabled 'sudo' for designated users
+
 
