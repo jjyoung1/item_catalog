@@ -46,6 +46,8 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgres
 
 [Backend Databases and Applications](https://classroom.udacity.com/nanodegrees/nd004/parts/8d3e23e1-9ab6-47eb-b4f3-d5dc7ef27bf0)
 
+## Ubuntu
+[Automatic Updates](https://help.ubuntu.com/lts/serverguide/automatic-updates.html)
 
 
 ## Server Configuration
@@ -76,5 +78,6 @@ the python packages specified in the 'requirements.txt' file
 * Created and installed rsa keys for users: jjyoung and grader
 * Modified sshd to disallow password login and allow only key-based authentication
 * Enabled 'sudo' for designated users
+* Configured Automatic Updates
 
 
